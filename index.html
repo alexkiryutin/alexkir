@@ -162,6 +162,15 @@ em{ font-style:italic; }
   animation:cue 1.8s ease-in-out infinite;
 }
 @keyframes cue{ 0%,100%{ transform:scaleY(.4); opacity:.4 } 50%{ transform:scaleY(1); opacity:1 } }
+.ripple-hint{
+  position:absolute; z-index:3; left:50%; bottom:26px; transform:translateX(-50%);
+  font-family:var(--mono); font-size:10px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--gain-soft); white-space:nowrap; pointer-events:none;
+  opacity:0; transition:opacity .6s ease;
+}
+.hero.can-ripple .ripple-hint{ opacity:.85; }
+.hero.can-ripple{ cursor:crosshair; }
+@media (prefers-reduced-motion: reduce){ .ripple-hint{ transition:none; } }
 @media (max-width:760px){
   :root{ --gutter: max(26px, 5vw); }
   .hero-inner{ top:90px; transform:none; }
@@ -274,6 +283,11 @@ em{ font-style:italic; }
 .phase h3{ font-family:var(--serif); font-weight:400; font-size:26px; margin-bottom:12px; }
 .phase p{ font-size:14.5px; line-height:1.65; color:#A9B0BE; }
 @media (max-width:900px){ .phases{ grid-template-columns:1fr; } }
+.method-note{ max-width:40em; margin-bottom:clamp(44px,5vw,72px); }
+.method-note .mono{ display:block; margin-bottom:14px; color:var(--annot); }
+.method-note p{ font-size:clamp(15px,1.3vw,17px); line-height:1.7; color:#B9BFCB; }
+.method-note p + p{ margin-top:1em; }
+.method-note .lead-w{ font-style:italic; color:var(--gain-soft); }
 
 /* work */
 .work-list{ border-top:1px solid var(--graphite); }
@@ -482,7 +496,7 @@ footer a:hover{ color:var(--bone); }
   <div class="hero-inner">
     <p class="eyebrow mono">Creative partner · Industrial &amp; B2B · PhD Art &amp; Science, Sorbonne</p>
     <h1>I help leaders make <span class="jump">the&nbsp;jump</span>.</h1>
-    <p class="hero-sub">Strategy, identity and design leadership for industrial and B2B companies. One brain, fully engaged on your hardest problem, from first sketch to shipped reality.</p>
+    <p class="hero-sub">Strategy, identity and design leadership for industrial and B2B companies. One brain on your hardest change, calculating the trajectory and showing you the landing before you leave the ground. From first sketch to shipped reality.</p>
     <p class="hero-meta mono">Alex Kir · Paris / Remote</p>
   </div>
 
@@ -509,13 +523,14 @@ footer a:hover{ color:var(--bone); }
           <div class="hud-box chip-accent">pain</div><div class="hud-box">no map</div><div class="hud-box">temporary</div>
         </div>
         <div class="stage gain" data-stage="2">
-          <div class="hud-box chip-accent">gain</div><div class="hud-box">compounding</div>
+          <div class="hud-box chip-accent">gain</div><div class="hud-box">ripple effect</div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="scroll-cue" aria-hidden="true">scroll to run the trajectory</div>
+  <div class="ripple-hint" aria-hidden="true">click the field to send a ripple</div>
 </header>
 
 <!-- ================= credibility strip ================= -->
@@ -543,7 +558,7 @@ footer a:hover{ color:var(--bone); }
       <div>
         <p class="lede rv"><em>A way of thinking</em>, trained in mathematics, raised on factory floors, finished at the Sorbonne.</p>
         <p class="rv">I grew up between an engineer's drafting table and an art book. That double lineage became a doctorate in Art &amp; Science at the Sorbonne, and a career spent translating between the people who build things and the people who buy them.</p>
-        <p class="rv">What clients come back for is judgement: the ability to walk into a complex, technical, slightly painful problem and design the way out of it.</p>
+        <p class="rv">What clients come back for is judgement: the ability to walk into a complex, technical, slightly painful problem and design the way out, and to say when a jump is too far or its timing wrong.</p>
         <p class="rv">I work shoulder to shoulder with founders and leadership teams of industry-oriented businesses, as the creative counterpart they do not have in-house. Leadership by design: I help people bring good things to life.</p>
       </div>
       <aside class="spec rv" aria-label="Specification">
@@ -570,9 +585,9 @@ footer a:hover{ color:var(--bone); }
       <h2>Method</h2>
     </div>
 
-    <p class="method-intro rv">Every jump has a hard part: the moment a company lets go of the universe it knows, the way it used to look, sound and sell. My job is to manage the <span class="pain-w">pain</span> for the <span class="gain-w">gain</span>: a controlled trajectory instead of a leap of faith.</p>
+    <p class="method-intro rv">Companies rarely stall because they can't see the far side. They stall because they can't see the ground on the far side. Resistance to change isn't behavioural, it's emotional, and no one leaps toward a landing they can't picture. I calculate the trajectory so the <span class="pain-w">pain</span> stays contained and scheduled while the <span class="gain-w">gain</span> compounds and ripples out: a controlled crossing instead of a leap of faith.</p>
 
-    <figure class="method-figure rv" role="img" aria-label="Instrument view: pain is a contained bump between kickoff and shipping, while gain sags slightly at first, then compounds toward x one.">
+    <figure class="method-figure rv" role="img" aria-label="Instrument view: pain is a contained bump between kickoff and shipping, while gain sags slightly at first, then compounds and ripples out toward x one.">
       <svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg" fill="none">
         <!-- barrel frame -->
         <path d="M34,29.33 Q500,10.67 966,29.33 Q992,280 966,530.67 Q500,549.33 34,530.67 Q8,280 34,29.33 Z"
@@ -621,27 +636,33 @@ footer a:hover{ color:var(--bone); }
           <text class="fig-anno" x="926" y="497.33" text-anchor="end">T₁ SHIPPED</text>
           <text class="fig-curve-label fig-full" x="300" y="189.33" fill="#E0562E">PAIN · CONTAINED, SCHEDULED, TEMPORARY</text>
           <text class="fig-curve-label fig-mini" x="300" y="189.33" fill="#E0562E">PAIN</text>
-          <text class="fig-curve-label fig-full" x="936" y="440" text-anchor="end" fill="#7FA0FF">GAIN · COMPOUNDING</text>
+          <text class="fig-curve-label fig-full" x="936" y="440" text-anchor="end" fill="#7FA0FF">GAIN · RIPPLE EFFECT</text>
           <text class="fig-curve-label fig-mini" x="936" y="440" text-anchor="end" fill="#7FA0FF">GAIN</text>
         </g>
       </svg>
     </figure>
 
+    <div class="method-note rv">
+      <span class="mono">The interference model</span>
+      <p>Every crossing meets <span class="lead-w">interference</span>: internal politics, the sunk-cost attachment to the old identity, a sales team fluent in the old pitch, the founder's own doubt. I map those forces before we launch, the ones that pull a company back toward the universe it knows, and design the crossing to survive them.</p>
+      <p>Analysis proves a jump is possible. Seeing the landing is what makes a leader take it.</p>
+    </div>
+
     <div class="phases">
       <article class="phase rv">
         <span class="mono"><i>Phase 1</i> · launch window</span>
         <h3>Diagnose</h3>
-        <p>Two to four weeks inside your business. Markets, machines, margins, people. We name the real problem, which is rarely the one in the brief.</p>
+        <p>Two to four weeks inside your business. Markets, machines, margins, people. We name the real problem, which is rarely the one in the brief, and map what will resist the change.</p>
       </article>
       <article class="phase rv">
         <span class="mono"><i>Phase 2</i> · the vehicle</span>
         <h3>Design</h3>
-        <p>Strategy, positioning, identity, product and sales narrative built as one system. Decisions made with leadership, not presented to it.</p>
+        <p>Strategy, positioning, identity, product and sales narrative built as one system, until the new universe is specific enough to stand in. Decisions made with leadership, not presented to it.</p>
       </article>
       <article class="phase rv">
         <span class="mono"><i>Phase 3</i> · the crossing</span>
         <h3>Deploy</h3>
-        <p>I stay on as creative partner while it ships: briefing teams, directing vendors, protecting the idea through the messy middle.</p>
+        <p>I stay on as creative partner while it ships: briefing teams, directing vendors, protecting the idea through the messy middle, the crossing where most transformations lose their nerve.</p>
       </article>
     </div>
   </div>
@@ -857,13 +878,17 @@ footer a:hover{ color:var(--bone); }
   var tEl = document.getElementById("tval");
   var stages = Array.prototype.slice.call(document.querySelectorAll(".hero-hud .stage"));
   var progressObj = { t: 0 };
+  var curStage = 0;
+  var heroEl = document.getElementById("top");
 
   function setStage(t){
     var idx = t < 0.34 ? 0 : (t < 0.72 ? 1 : 2);
+    curStage = idx;
     for (var i = 0; i < stages.length; i++) {
       var si = parseInt(stages[i].getAttribute("data-stage"), 10);
       stages[i].classList.toggle("is-on", si === idx);
     }
+    if (heroEl) heroEl.classList.toggle("can-ripple", idx === 2 && !reduced);
     if (tEl) tEl.textContent = t.toFixed(2);
   }
 
@@ -978,7 +1003,9 @@ footer a:hover{ color:var(--bone); }
       uColGrid:       { value: new THREE.Color("#55617A") },
       uColChaos:      { value: new THREE.Color("#E0562E") },
       uColGain:       { value: new THREE.Color("#5E86FF") },
-      uColHot:        { value: new THREE.Color("#DCE5FF") }
+      uColHot:        { value: new THREE.Color("#DCE5FF") },
+      uRippleCenter:  { value: new THREE.Vector2(0, 0) },
+      uRippleT:       { value: -1.0 }
     };
 
     var mat = new THREE.ShaderMaterial({
@@ -997,11 +1024,14 @@ footer a:hover{ color:var(--bone); }
         "uniform float uSize;",
         "uniform float uScale;",
         "uniform float uIntro;",
+        "uniform vec2  uRippleCenter;",
+        "uniform float uRippleT;",
         "varying float vPhase;",
         "varying float vChaos;",
         "varying float vSeed;",
         "varying float vHot;",
         "varying float vIntro;",
+        "varying float vRip;",
         "float ease(float t){ return t*t*(3.0-2.0*t); }",
         "void main(){",
         "  float stag = aSeed.x * 0.30;",
@@ -1031,6 +1061,21 @@ footer a:hover{ color:var(--bone); }
         "  float ie = ip * ip * (3.0 - 2.0 * ip);",
         "  vec3 scatter = (vec3(aSeed.y, aSeed.z, aSeed.x) * 2.0 - 1.0) * vec3(9.0, 6.0, 4.0);",
         "  pos += scatter * (1.0 - ie);",
+        "  // click ripple — an expanding ring of displacement pushing particles outward as it passes",
+        "  vRip = 0.0;",
+        "  if (uRippleT >= 0.0) {",
+        "    vec2 rd = pos.xy - uRippleCenter;",
+        "    float rdist = length(rd);",
+        "    float front = uRippleT * 7.0;",
+        "    float ring = rdist - front;",
+        "    float band = exp(-ring * ring * 1.4);",
+        "    float decay = exp(-uRippleT * 1.6);",
+        "    vec2 rdir = rdist > 0.0001 ? rd / rdist : vec2(0.0);",
+        "    float amt = band * decay;",
+        "    pos.xy += rdir * amt * 0.95;",
+        "    pos.z  += sin(rdist * 3.0 - uRippleT * 10.0) * amt * 0.4;",
+        "    vRip = amt;",
+        "  }",
         "  vIntro = ie;",
         "  vPhase = m;",
         "  vChaos = bell;",
@@ -1038,7 +1083,7 @@ footer a:hover{ color:var(--bone); }
         "  vHot = fall;",
         "  vec4 mv = modelViewMatrix * vec4(pos, 1.0);",
         "  gl_Position = projectionMatrix * mv;",
-        "  float sz = uSize * (0.55 + aSeed.y * 0.9 + fall * 0.7 + bell * 0.35);",
+        "  float sz = uSize * (0.55 + aSeed.y * 0.9 + fall * 0.7 + bell * 0.35 + vRip * 0.8);",
         "  gl_PointSize = sz * uScale / max(-mv.z, 0.1);",
         "}"
       ].join("\n"),
@@ -1052,6 +1097,7 @@ footer a:hover{ color:var(--bone); }
         "varying float vSeed;",
         "varying float vHot;",
         "varying float vIntro;",
+        "varying float vRip;",
         "void main(){",
         "  vec2 uv = gl_PointCoord - 0.5;",
         "  float d = length(uv);",
@@ -1059,7 +1105,8 @@ footer a:hover{ color:var(--bone); }
         "  vec3 col = mix(uColGrid, uColGain, vPhase);",
         "  col = mix(col, uColChaos, vChaos * (0.25 + 0.55 * vSeed));",
         "  col = mix(col, uColHot, clamp(vHot, 0.0, 1.0) * 0.8);",
-        "  float alpha = a * (0.34 + 0.5 * vPhase + 0.25 * vChaos + 0.3 * vHot) * vIntro;",
+        "  col = mix(col, uColHot, clamp(vRip, 0.0, 1.0));",
+        "  float alpha = a * (0.34 + 0.5 * vPhase + 0.25 * vChaos + 0.3 * vHot + 0.6 * vRip) * vIntro;",
         "  if (alpha < 0.015) discard;",
         "  gl_FragColor = vec4(col, alpha);",
         "}"
@@ -1097,6 +1144,7 @@ footer a:hover{ color:var(--bone); }
     /* ---- pointer → world coords on z=0 plane ---- */
     var mouseTarget = new THREE.Vector3(99, 99, 0);
     var strengthTarget = 0;
+    var rippleActive = false, rippleStart = 0;
     function pointerToWorld(clientX, clientY){
       var rect = canvas.getBoundingClientRect();
       var nx = ((clientX - rect.left) / rect.width) * 2 - 1;
@@ -1116,6 +1164,27 @@ footer a:hover{ color:var(--bone); }
       if (e.touches.length) { pointerToWorld(e.touches[0].clientX, e.touches[0].clientY); strengthTarget = 1; }
     }, { passive: true });
     window.addEventListener("touchend", function(){ strengthTarget = 0; });
+
+    /* ---- click ripple: only live once the trajectory has landed at x₁ ---- */
+    function clientToWorldXY(clientX, clientY){
+      var rect = canvas.getBoundingClientRect();
+      var nx = ((clientX - rect.left) / rect.width) * 2 - 1;
+      var ny = -((clientY - rect.top) / rect.height) * 2 + 1;
+      var vH = 2 * Math.tan((camera.fov * Math.PI / 180) / 2) * BASE_Z;
+      var vW = vH * camera.aspect;
+      var s = group.scale.x;
+      return { x: (nx * vW / 2) / s, y: (ny * vH / 2) / s };
+    }
+    if (heroEl) {
+      heroEl.addEventListener("pointerdown", function(e){
+        if (reduced || curStage !== 2) return;
+        var w = clientToWorldXY(e.clientX, e.clientY);
+        uniforms.uRippleCenter.value.set(w.x, w.y);
+        rippleStart = clock.getElapsedTime();
+        uniforms.uRippleT.value = 0.0;
+        rippleActive = true;
+      });
+    }
 
     /* ---- camera parallax (desktop only, subtle) ---- */
     var camX = 0, camY = 0;
@@ -1138,6 +1207,11 @@ footer a:hover{ color:var(--bone); }
       uniforms.uProgress.value = progressObj.t;
       uniforms.uMouse.value.lerp(mouseTarget, 0.08);
       uniforms.uMouseStrength.value += (strengthTarget - uniforms.uMouseStrength.value) * 0.06;
+      if (rippleActive) {
+        var rt = t - rippleStart;
+        uniforms.uRippleT.value = rt;
+        if (rt > 2.2) { rippleActive = false; uniforms.uRippleT.value = -1.0; }
+      }
       camera.position.x += (camX * 0.7 - camera.position.x) * 0.04;
       camera.position.y += (-camY * 0.5 - camera.position.y) * 0.04;
       camera.lookAt(0, 0, 0);
