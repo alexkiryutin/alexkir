@@ -162,15 +162,6 @@ em{ font-style:italic; }
   animation:cue 1.8s ease-in-out infinite;
 }
 @keyframes cue{ 0%,100%{ transform:scaleY(.4); opacity:.4 } 50%{ transform:scaleY(1); opacity:1 } }
-.ripple-hint{
-  position:absolute; z-index:3; left:50%; bottom:26px; transform:translateX(-50%);
-  font-family:var(--mono); font-size:10px; letter-spacing:.22em; text-transform:uppercase;
-  color:var(--gain-soft); white-space:nowrap; pointer-events:none;
-  opacity:0; transition:opacity .6s ease;
-}
-.hero.can-ripple .ripple-hint{ opacity:.85; }
-.hero.can-ripple{ cursor:crosshair; }
-@media (prefers-reduced-motion: reduce){ .ripple-hint{ transition:none; } }
 @media (max-width:760px){
   :root{ --gutter: max(26px, 5vw); }
   .hero-inner{ top:90px; transform:none; }
@@ -283,11 +274,6 @@ em{ font-style:italic; }
 .phase h3{ font-family:var(--serif); font-weight:400; font-size:26px; margin-bottom:12px; }
 .phase p{ font-size:14.5px; line-height:1.65; color:#A9B0BE; }
 @media (max-width:900px){ .phases{ grid-template-columns:1fr; } }
-.method-note{ max-width:40em; margin-bottom:clamp(44px,5vw,72px); }
-.method-note .mono{ display:block; margin-bottom:14px; color:var(--annot); }
-.method-note p{ font-size:clamp(15px,1.3vw,17px); line-height:1.7; color:#B9BFCB; }
-.method-note p + p{ margin-top:1em; }
-.method-note .lead-w{ font-style:italic; color:var(--gain-soft); }
 
 /* work */
 .work-list{ border-top:1px solid var(--graphite); }
@@ -470,6 +456,25 @@ footer a:hover{ color:var(--bone); }
   .x1-orbit,.x1-pulse{ animation:none; }
   .format:hover::before{ animation:none; }
 }
+
+/* ============ shader layer (all overlays are absolutely positioned, out of flow) ============ */
+.hero.gl-on .hero-grid-wrap{ display:none; }
+.probe-readout{
+  position:absolute; z-index:3; left:0; top:0; pointer-events:none;
+  font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:10px; font-weight:500;
+  letter-spacing:.1em; text-transform:uppercase; white-space:nowrap;
+  color:var(--bone); background:rgba(11,19,34,.72); padding:3px 7px;
+  opacity:0; transition:opacity .25s ease; will-change:transform;
+}
+.probe-readout.on{ opacity:1; }
+@media (hover:none){ .probe-readout{ display:none; } }
+/* hero hold: CSS sticky inside a track the same height the old JS pin-spacer had */
+.hero-track.is-scrubbed{ height:380vh; height:380svh; }
+.hero-track.is-scrubbed > .hero{ position:sticky; top:0; }
+/* body must not become a scroll container, or sticky silently stops working */
+@supports (overflow:clip){ body{ overflow-x:clip; } }
+.x1-canvas{ position:absolute; display:block; pointer-events:none; }
+.x1-mark.x1-gl .x1-ring, .x1-mark.x1-gl .x1-orbit, .x1-mark.x1-gl .x1-approach{ display:none; }
 </style>
 </head>
 <body class="no-js">
@@ -486,6 +491,7 @@ footer a:hover{ color:var(--bone); }
 </nav>
 
 <!-- ================= HERO / fig. 00 — the field ================= -->
+<div class="hero-track" id="heroTrack">
 <header class="hero" id="top">
   <canvas id="field" aria-hidden="true"></canvas>
   <div class="hero-grid-wrap" id="crtWrap" aria-hidden="true">
@@ -496,7 +502,7 @@ footer a:hover{ color:var(--bone); }
   <div class="hero-inner">
     <p class="eyebrow mono">Creative partner · Industrial &amp; B2B · PhD Art &amp; Science, Sorbonne</p>
     <h1>I help leaders make <span class="jump">the&nbsp;jump</span>.</h1>
-    <p class="hero-sub">Strategy, identity and design leadership for industrial and B2B companies. One brain on your hardest change, calculating the trajectory and showing you the landing before you leave the ground. From first sketch to shipped reality.</p>
+    <p class="hero-sub">Strategy, identity and design leadership for industrial and B2B companies. One brain, fully engaged on your hardest problem, from first sketch to shipped reality.</p>
     <p class="hero-meta mono">Alex Kir · Paris / Remote</p>
   </div>
 
@@ -523,15 +529,16 @@ footer a:hover{ color:var(--bone); }
           <div class="hud-box chip-accent">pain</div><div class="hud-box">no map</div><div class="hud-box">temporary</div>
         </div>
         <div class="stage gain" data-stage="2">
-          <div class="hud-box chip-accent">gain</div><div class="hud-box">ripple effect</div>
+          <div class="hud-box chip-accent">gain</div><div class="hud-box">compounding</div>
         </div>
       </div>
     </div>
   </div>
 
+  <div class="probe-readout" id="probeReadout" aria-hidden="true"></div>
   <div class="scroll-cue" aria-hidden="true">scroll to run the trajectory</div>
-  <div class="ripple-hint" aria-hidden="true">click the field to send a ripple</div>
 </header>
+</div>
 
 <!-- ================= credibility strip ================= -->
 <div class="strip" aria-label="Credentials">
@@ -558,7 +565,7 @@ footer a:hover{ color:var(--bone); }
       <div>
         <p class="lede rv"><em>A way of thinking</em>, trained in mathematics, raised on factory floors, finished at the Sorbonne.</p>
         <p class="rv">I grew up between an engineer's drafting table and an art book. That double lineage became a doctorate in Art &amp; Science at the Sorbonne, and a career spent translating between the people who build things and the people who buy them.</p>
-        <p class="rv">What clients come back for is judgement: the ability to walk into a complex, technical, slightly painful problem and design the way out, and to say when a jump is too far or its timing wrong.</p>
+        <p class="rv">What clients come back for is judgement: the ability to walk into a complex, technical, slightly painful problem and design the way out of it.</p>
         <p class="rv">I work shoulder to shoulder with founders and leadership teams of industry-oriented businesses, as the creative counterpart they do not have in-house. Leadership by design: I help people bring good things to life.</p>
       </div>
       <aside class="spec rv" aria-label="Specification">
@@ -585,9 +592,9 @@ footer a:hover{ color:var(--bone); }
       <h2>Method</h2>
     </div>
 
-    <p class="method-intro rv">Companies rarely stall because they can't see the far side. They stall because they can't see the ground on the far side. Resistance to change isn't behavioural, it's emotional, and no one leaps toward a landing they can't picture. I calculate the trajectory so the <span class="pain-w">pain</span> stays contained and scheduled while the <span class="gain-w">gain</span> compounds and ripples out: a controlled crossing instead of a leap of faith.</p>
+    <p class="method-intro rv">Every jump has a hard part: the moment a company lets go of the universe it knows, the way it used to look, sound and sell. My job is to manage the <span class="pain-w">pain</span> for the <span class="gain-w">gain</span>: a controlled trajectory instead of a leap of faith.</p>
 
-    <figure class="method-figure rv" role="img" aria-label="Instrument view: pain is a contained bump between kickoff and shipping, while gain sags slightly at first, then compounds and ripples out toward x one.">
+    <figure class="method-figure rv" role="img" aria-label="Instrument view: pain is a contained bump between kickoff and shipping, while gain sags slightly at first, then compounds toward x one.">
       <svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg" fill="none">
         <!-- barrel frame -->
         <path d="M34,29.33 Q500,10.67 966,29.33 Q992,280 966,530.67 Q500,549.33 34,530.67 Q8,280 34,29.33 Z"
@@ -636,33 +643,27 @@ footer a:hover{ color:var(--bone); }
           <text class="fig-anno" x="926" y="497.33" text-anchor="end">T₁ SHIPPED</text>
           <text class="fig-curve-label fig-full" x="300" y="189.33" fill="#E0562E">PAIN · CONTAINED, SCHEDULED, TEMPORARY</text>
           <text class="fig-curve-label fig-mini" x="300" y="189.33" fill="#E0562E">PAIN</text>
-          <text class="fig-curve-label fig-full" x="936" y="440" text-anchor="end" fill="#7FA0FF">GAIN · RIPPLE EFFECT</text>
-          <text class="fig-curve-label fig-mini" x="936" y="440" text-anchor="end" fill="#7FA0FF">GAIN</text>
+          <text class="fig-curve-label fig-full" x="936" y="330" text-anchor="end" fill="#7FA0FF">GAIN · COMPOUNDING</text>
+          <text class="fig-curve-label fig-mini" x="936" y="330" text-anchor="end" fill="#7FA0FF">GAIN</text>
         </g>
       </svg>
     </figure>
-
-    <div class="method-note rv">
-      <span class="mono">The interference model</span>
-      <p>Every crossing meets <span class="lead-w">interference</span>: internal politics, the sunk-cost attachment to the old identity, a sales team fluent in the old pitch, the founder's own doubt. I map those forces before we launch, the ones that pull a company back toward the universe it knows, and design the crossing to survive them.</p>
-      <p>Analysis proves a jump is possible. Seeing the landing is what makes a leader take it.</p>
-    </div>
 
     <div class="phases">
       <article class="phase rv">
         <span class="mono"><i>Phase 1</i> · launch window</span>
         <h3>Diagnose</h3>
-        <p>Two to four weeks inside your business. Markets, machines, margins, people. We name the real problem, which is rarely the one in the brief, and map what will resist the change.</p>
+        <p>Two to four weeks inside your business. Markets, machines, margins, people. We name the real problem, which is rarely the one in the brief.</p>
       </article>
       <article class="phase rv">
         <span class="mono"><i>Phase 2</i> · the vehicle</span>
         <h3>Design</h3>
-        <p>Strategy, positioning, identity, product and sales narrative built as one system, until the new universe is specific enough to stand in. Decisions made with leadership, not presented to it.</p>
+        <p>Strategy, positioning, identity, product and sales narrative built as one system. Decisions made with leadership, not presented to it.</p>
       </article>
       <article class="phase rv">
         <span class="mono"><i>Phase 3</i> · the crossing</span>
         <h3>Deploy</h3>
-        <p>I stay on as creative partner while it ships: briefing teams, directing vendors, protecting the idea through the messy middle, the crossing where most transformations lose their nerve.</p>
+        <p>I stay on as creative partner while it ships: briefing teams, directing vendors, protecting the idea through the messy middle.</p>
       </article>
     </div>
   </div>
@@ -690,7 +691,7 @@ footer a:hover{ color:var(--bone); }
           <p class="case-note">The mark's three primitives, dot, frame and arrow, mapped onto the brand promise (Clarity, Control, Certainty) and became the design system: the Adaptive Card governing every layout, a motion-first identity, a production-ready asset library, and a Webflow site with trackable interactive company profiles per client.</p>
           <span class="case-format">Format A · The Jump: mark to launched reality in one move.</span>
           <div class="case-links">
-            <a class="case-link" href="https://t-r-i.net/work/vistas.html" target="_blank" rel="noopener">Case study ↗</a>
+            <a class="case-link" href="https://t-r-i.net/blog/vistas-rathmore" target="_blank" rel="noopener">Case study ↗</a>
             <a class="case-link" href="https://vistasrathmore.com" target="_blank" rel="noopener">Live site ↗</a>
             <a class="case-link" href="https://youtu.be/1SzOc1pRM4A" target="_blank" rel="noopener">Hero movie ↗</a>
           </div>
@@ -711,7 +712,7 @@ footer a:hover{ color:var(--bone); }
           <p class="case-note">Built shoulder to shoulder with the founders, from whiteboard sketches of geometric-spectral triplets to capture-frame design language, a hero interaction that lets visitors scan a gemstone, and a 26-second launch film that is logo reveal and technology explainer in one motion.</p>
           <span class="case-format">Format B · Creative partner: alongside the founders, the whole crossing.</span>
           <div class="case-links">
-            <a class="case-link" href="https://t-r-i.net/work/tachyon.html" target="_blank" rel="noopener">Case study ↗</a>
+            <a class="case-link" href="https://t-r-i.net/blog/tachyon-impact-solutions" target="_blank" rel="noopener">Case study ↗</a>
             <a class="case-link" href="https://www.tachyonimpactsolutions.com/" target="_blank" rel="noopener">Live site ↗</a>
             <a class="case-link" href="https://www.youtube.com/watch?v=1WGJ3XCP2DA" target="_blank" rel="noopener">Launch movie ↗</a>
           </div>
@@ -732,7 +733,7 @@ footer a:hover{ color:var(--bone); }
           <p class="case-note">Logo, guidelines, messaging and the investor and sales materials that carry them: one system built to head off market confusion and conflicts of interest as the company scaled into its next phase.</p>
           <span class="case-format">Format A · The Jump: repositioning, from diagnosis to deployed assets.</span>
           <div class="case-links">
-            <a class="case-link" href="https://t-r-i.net/work/funnelfuel.html" target="_blank" rel="noopener">Case study ↗</a>
+            <a class="case-link" href="https://t-r-i.net/portfolio#funnelfuel" target="_blank" rel="noopener">Case study ↗</a>
             <a class="case-link" href="https://www.funnelfuel.io/" target="_blank" rel="noopener">Live site ↗</a>
           </div>
           </div>
@@ -771,7 +772,7 @@ footer a:hover{ color:var(--bone); }
           <p class="case-note">Keynote, Pages and Sheets templates plus a capability statement: proposals, production schedules, call sheets and invoices unified under one visual logic, faster to produce and stronger in front of clients.</p>
           <span class="case-format">Format D · Second opinion: a sharp review before it got expensive.</span>
           <div class="case-links">
-            <a class="case-link" href="https://t-r-i.net/work/zerocool.html" target="_blank" rel="noopener">Case study ↗</a>
+            <a class="case-link" href="https://t-r-i.net/portfolio#zerocool" target="_blank" rel="noopener">Case study ↗</a>
             <a class="case-link" href="https://www.zerocool.tv/" target="_blank" rel="noopener">Live site ↗</a>
           </div>
           </div>
@@ -829,11 +830,11 @@ footer a:hover{ color:var(--bone); }
   <div class="x1-mark" aria-hidden="true">
     <svg viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg" fill="none">
       <!-- approach trajectory arriving from the page's flow -->
-      <path d="M4,250 C66,238 94,198 116,152" stroke="#2C5BFF" stroke-width="1.5" stroke-dasharray="3 6"/>
+      <path class="x1-approach" d="M4,250 C66,238 94,198 116,152" stroke="#2C5BFF" stroke-width="1.5" stroke-dasharray="3 6"/>
       <!-- destination rings -->
-      <circle cx="130" cy="130" r="84" stroke="rgba(232,228,218,0.13)" stroke-dasharray="2 7"/>
-      <circle cx="130" cy="130" r="52" stroke="rgba(127,160,255,0.4)" stroke-dasharray="4 6"/>
-      <circle cx="130" cy="130" r="22" stroke="#7FA0FF" stroke-width="1"/>
+      <circle class="x1-ring" cx="130" cy="130" r="84" stroke="rgba(232,228,218,0.13)" stroke-dasharray="2 7"/>
+      <circle class="x1-ring" cx="130" cy="130" r="52" stroke="rgba(127,160,255,0.4)" stroke-dasharray="4 6"/>
+      <circle class="x1-ring" cx="130" cy="130" r="22" stroke="#7FA0FF" stroke-width="1"/>
       <g class="x1-pulse"><circle cx="130" cy="130" r="22" stroke="#2C5BFF" stroke-width="1"/></g>
       <!-- crosshair ticks -->
       <g stroke="rgba(126,138,160,0.7)" stroke-width="1">
@@ -858,6 +859,424 @@ footer a:hover{ color:var(--bone); }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<!-- ================= shader sources (read by the script below) ================= -->
+<script type="x-shader/x-vertex" id="vsField">
+attribute vec3 aGrid;
+attribute vec3 aTarget;
+attribute vec3 aSeed;
+attribute vec4 aInfo;            // curveT, isHalo, visible at x0, lattice intersection
+uniform float uProgress;
+uniform float uTime;
+uniform vec2  uMouse;
+uniform float uMouseStrength;
+uniform float uSize;
+uniform float uScale;
+uniform float uIntro;
+uniform float uDrift;
+uniform float uCamD;
+uniform float uFocus;
+uniform float uCocK;
+uniform vec2  uObsC;
+uniform vec2  uObsH;
+uniform float uObsPush;
+uniform float uObsDim;
+uniform float uLoupeR;
+uniform float uLoupeA;
+varying vec4 vA;                 // phase, chaos, seed, hot
+varying vec4 vB;                 // intro, circle of confusion, visibility, intersection
+varying vec2 vC;                 // bloom weight, filament
+
+vec3 mod289(vec3 x){ return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec4 mod289(vec4 x){ return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec4 permute(vec4 x){ return mod289(((x * 34.0) + 1.0) * x); }
+vec4 taylorInvSqrt(vec4 r){ return 1.79284291400159 - 0.85373472095314 * r; }
+float snoise(vec3 v){
+  const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
+  const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+  vec3 i  = floor(v + dot(v, C.yyy));
+  vec3 x0 = v - i + dot(i, C.xxx);
+  vec3 g  = step(x0.yzx, x0.xyz);
+  vec3 l  = 1.0 - g;
+  vec3 i1 = min(g.xyz, l.zxy);
+  vec3 i2 = max(g.xyz, l.zxy);
+  vec3 x1 = x0 - i1 + C.xxx;
+  vec3 x2 = x0 - i2 + C.yyy;
+  vec3 x3 = x0 - D.yyy;
+  i = mod289(i);
+  vec4 p = permute(permute(permute(
+             i.z + vec4(0.0, i1.z, i2.z, 1.0))
+           + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+           + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+  float n_ = 0.142857142857;
+  vec3 ns = n_ * D.wyz - D.xzx;
+  vec4 j  = p - 49.0 * floor(p * ns.z * ns.z);
+  vec4 x_ = floor(j * ns.z);
+  vec4 y_ = floor(j - 7.0 * x_);
+  vec4 x  = x_ * ns.x + ns.yyyy;
+  vec4 y  = y_ * ns.x + ns.yyyy;
+  vec4 h  = 1.0 - abs(x) - abs(y);
+  vec4 b0 = vec4(x.xy, y.xy);
+  vec4 b1 = vec4(x.zw, y.zw);
+  vec4 s0 = floor(b0) * 2.0 + 1.0;
+  vec4 s1 = floor(b1) * 2.0 + 1.0;
+  vec4 sh = -step(h, vec4(0.0));
+  vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+  vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+  vec3 p0 = vec3(a0.xy, h.x);
+  vec3 p1 = vec3(a0.zw, h.y);
+  vec3 p2 = vec3(a1.xy, h.z);
+  vec3 p3 = vec3(a1.zw, h.w);
+  vec4 norm = taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+  p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+  vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
+  m = m * m;
+  return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
+}
+// divergence-free 2D flow: rotated gradient of a noise potential
+vec2 curl2(vec3 p){
+  const float e = 0.09;
+  float a = snoise(p + vec3(0.0, e, 0.0));
+  float b = snoise(p - vec3(0.0, e, 0.0));
+  float c = snoise(p + vec3(e, 0.0, 0.0));
+  float d = snoise(p - vec3(e, 0.0, 0.0));
+  return vec2(a - b, d - c) / (2.0 * e);
+}
+float ease(float t){ return t * t * (3.0 - 2.0 * t); }
+
+void main(){
+  float stag = aSeed.x * 0.30;
+  float p = clamp((uProgress - stag) / 0.70, 0.0, 1.0);
+  float m = ease(p);
+  vec3 pos = mix(aGrid, aTarget, m);
+
+  // idle drift: the field breathes, held almost still while the lattice is ordered
+  float drift = 0.05 * uDrift * mix(0.2, 1.0, m);
+  pos.x += sin(uTime * 0.5 + aSeed.y * 43.0) * drift;
+  pos.y += cos(uTime * 0.42 + aSeed.z * 37.0) * drift;
+
+  // turbulence bell, peaks mid-trajectory: two advection steps through a curl-noise flow
+  float bell = sin(3.14159265 * clamp(uProgress, 0.0, 1.0));
+  bell *= bell;
+  float fil = 0.0;
+  if (bell > 0.0005) {
+    float amp = pow(bell, 1.5) * (0.8 + aSeed.z * 0.4);   // straightens sooner as x1 resolves
+    float ft = uTime * 0.09;
+    vec2 v1 = curl2(vec3(pos.xy * 0.33, ft));
+    vec2 q  = pos.xy + v1 * 0.6 * amp;
+    vec2 v2 = curl2(vec3(q * 0.33, ft + 0.35));
+    pos.xy += (v1 + v2) * 0.6 * amp + (aSeed.xy - 0.5) * 0.25 * bell;
+    pos.z  += snoise(vec3(pos.xy * 0.22, ft * 1.7 + 11.0)) * amp * 1.1;
+    fil = clamp(length(v1 + v2) * 0.22, 0.0, 1.0);
+  }
+
+  // depth: the trajectory recedes toward kickoff. xy is compensated so the projected
+  // composition is unchanged; only parallax and focus reveal the depth
+  float dzT = aInfo.y > 0.5 ? 0.35 : (-1.3 * pow(1.0 - aInfo.x, 1.3) + 0.35 * aInfo.x);
+  float z0 = pos.z;
+  pos.z += dzT * m;
+  float comp = (uCamD - pos.z) / (uCamD - z0);
+  pos.xy *= comp;
+
+  // headline as an obstacle: a smooth parting field (monotonic, like the loupe), so particles
+  // thin out and slide around the text without piling into a visible wall; plus a soft scrim
+  vec2 ext = uObsH + 0.55;
+  vec2 qn = (pos.xy - uObsC) / ext;
+  vec2 q4 = qn * qn;
+  q4 *= q4;
+  float sr = pow(q4.x + q4.y, 0.25);
+  float dim = 1.0 - uObsDim * (1.0 - smoothstep(0.62, 1.05, sr));
+  if (uObsPush > 0.001 && sr < 1.0) {
+    float ow = (1.0 - sr) * (1.0 - sr);
+    pos.xy = uObsC + (pos.xy - uObsC) * (1.0 + 0.9 * uObsPush * ow);
+  }
+
+  // probe: a loupe. Monotonic radial magnification, so nothing folds or clumps
+  vec2 dm = pos.xy - uMouse;
+  float xr = length(dm) / uLoupeR;
+  float hot = 0.0;
+  float mag = 1.0;
+  if (xr < 1.0) {
+    float w = (1.0 - xr) * (1.0 - xr);
+    mag = 1.0 + uLoupeA * uMouseStrength * w;
+    pos.xy = uMouse + dm * mag;
+    hot = w * uMouseStrength;
+  }
+
+  // birth: each particle drifts in from a random offset, staggered, fading from zero
+  float ip = clamp((uIntro - aSeed.y * 0.55) / 0.45, 0.0, 1.0);
+  float ie = ease(ip);
+  vec3 scatter = (vec3(aSeed.y, aSeed.z, aSeed.x) * 2.0 - 1.0) * vec3(9.0, 6.0, 4.0);
+  pos += scatter * (1.0 - ie);
+
+  // focus rack: circle of confusion from distance to the travelling focal plane
+  float coc = clamp(abs(pos.z - uFocus) * uCocK, 0.0, 1.2);
+
+  vec4 mv = modelViewMatrix * vec4(pos, 1.0);
+  gl_Position = projectionMatrix * mv;
+  float inter = aInfo.w * (1.0 - m);
+  float sizeVar = mix(1.0, 0.55 + aSeed.y * 0.9, m);
+  float sz = uSize * sizeVar * (1.0 + 0.85 * inter) * (1.0 + bell * 0.35) * mag * comp * (1.0 + coc * 2.2);
+  gl_PointSize = max(sz * uScale / max(-mv.z, 0.1), 1.0);
+
+  float vis = mix(aInfo.z, 1.0, smoothstep(0.0, 0.2, m + bell * 0.4));
+  float bloomW = m * m * (aInfo.y > 0.5 ? 1.0 : smoothstep(0.6, 1.0, aInfo.x));
+  vA = vec4(m, bell, aSeed.x, hot);
+  vB = vec4(ie, coc, vis * dim, inter);
+  vC = vec2(bloomW, fil);
+}
+</script>
+<script type="x-shader/x-fragment" id="fsField">
+uniform vec3 uColGrid;
+uniform vec3 uColInter;
+uniform vec3 uColChaos;
+uniform vec3 uColGain;
+uniform vec3 uColHot;
+uniform float uPass;
+uniform float uOut;
+varying vec4 vA;
+varying vec4 vB;
+varying vec2 vC;
+void main(){
+  vec2 uv = gl_PointCoord - 0.5;
+  float phase = vA.x;
+  // pixel to light: a crisp square dot at x0 becomes a soft round glow at x1
+  float shapeMix = max(smoothstep(0.05, 0.6, phase), clamp(vB.y * 1.6, 0.0, 1.0));  // defocus is always round
+  float d = mix(max(abs(uv.x), abs(uv.y)), length(uv), shapeMix);
+  float inner = mix(0.36, 0.16, shapeMix);
+  inner = mix(inner, 0.0, clamp(vB.y, 0.0, 1.0));
+  float a = 1.0 - smoothstep(inner, 0.5, d);
+  vec3 col = mix(uColGrid, uColGain, phase);
+  col = mix(col, uColInter, vB.w);
+  col = mix(col, uColChaos, vA.y * (0.12 + 0.78 * vC.y) * (0.35 + 0.65 * vA.z));
+  col = mix(col, uColHot, clamp(vA.w, 0.0, 1.0) * 0.6);
+  float alpha = a * (0.6 + 0.26 * phase + 0.22 * vA.y + 0.3 * vA.w + 0.4 * vB.w) * vB.x * vB.z;
+  alpha /= pow(1.0 + vB.y * 2.2, 1.35);
+  if (uPass > 0.5) alpha *= vC.x;
+  if (alpha < 0.004) discard;
+  gl_FragColor = vec4(col * alpha * uOut, alpha);
+}
+</script>
+<script type="x-shader/x-vertex" id="vsQuad">
+varying vec2 vUv;
+void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }
+</script>
+<script type="x-shader/x-fragment" id="fsTrail">
+uniform sampler2D tScene;
+uniform sampler2D tPrev;
+uniform float uDecay;
+varying vec2 vUv;
+// phosphor persistence: the brighter of this frame and the fading afterglow
+void main(){ gl_FragColor = max(texture2D(tScene, vUv), texture2D(tPrev, vUv) * uDecay); }
+</script>
+<script type="x-shader/x-fragment" id="fsBlur">
+uniform sampler2D tSrc;
+uniform vec2 uDir;
+varying vec2 vUv;
+void main(){
+  vec4 s = texture2D(tSrc, vUv) * 0.2270270270;
+  s += texture2D(tSrc, vUv + uDir * 1.3846153846) * 0.3162162162;
+  s += texture2D(tSrc, vUv - uDir * 1.3846153846) * 0.3162162162;
+  s += texture2D(tSrc, vUv + uDir * 3.2307692308) * 0.0702702703;
+  s += texture2D(tSrc, vUv - uDir * 3.2307692308) * 0.0702702703;
+  gl_FragColor = s;
+}
+</script>
+<script type="x-shader/x-fragment" id="fsComposite">
+uniform sampler2D tTrail;
+uniform sampler2D tBloom;
+uniform mat4  uInvPVM;
+uniform float uAspect;
+uniform float uK;
+uniform float uCA;
+uniform float uJit;
+uniform float uTime;
+uniform float uOutInv;
+uniform float uExposure;
+uniform float uBloomAmt;
+uniform float uDpr;
+uniform float uCell;
+uniform vec4  uLat;          // lattice half extents, bracket alpha, bracket offset
+uniform vec2  uGlass;        // counter-parallax of the glass
+uniform vec3  uProbe;        // probe centre (design units), strength
+uniform float uLoupeR;
+uniform float uScan;
+uniform float uGratA;
+uniform float uTopFade;      // mobile: canvas is shifted down, so fade into its top edge
+uniform vec4  uObs;          // headline box in design units: centre, half extents
+uniform vec3  uBg;
+uniform vec3  uGratCol;
+uniform vec3  uAnnot;
+uniform vec3  uReticle;
+varying vec2 vUv;
+
+float hash(float n){ return fract(sin(n) * 43758.5453123); }
+vec2 barrel(vec2 uv){
+  vec2 c = (uv - 0.5) * vec2(uAspect, 1.0);
+  c *= 1.0 + uK * dot(c, c);
+  return c / vec2(uAspect, 1.0) + 0.5;
+}
+// screen uv to the lattice plane (z = 0 in design space), exact under camera parallax
+vec2 toDesign(vec2 uv){
+  vec2 ndc = uv * 2.0 - 1.0;
+  vec4 a = uInvPVM * vec4(ndc, -1.0, 1.0); a.xyz /= a.w;
+  vec4 b = uInvPVM * vec4(ndc,  1.0, 1.0); b.xyz /= b.w;
+  float t = -a.z / (b.z - a.z);
+  return mix(a.xy, b.xy, t);
+}
+float aaLine(float dist, float fw, float halfW){
+  return 1.0 - smoothstep(halfW * fw, (halfW + 1.0) * fw, dist);
+}
+
+void main(){
+  vec2 suv = barrel(vUv);
+  vec2 gc = (vUv - 0.5 - uGlass) * vec2(uAspect, 1.0);
+  float rn = length(gc) / (0.5 * length(vec2(uAspect, 1.0)));
+  float edge = smoothstep(0.42, 0.95, rn);
+
+  // ---- the signal: sync jitter and palette-split aberration, both driven by the pain bell ----
+  float burst = step(0.55, hash(floor(uTime * 5.0)));
+  float band = floor(vUv.y * 110.0);
+  float jit = (hash(band * 1.37 + floor(uTime * 30.0)) - 0.5) * uJit * (0.35 + 0.65 * burst);
+  float tearY = hash(floor(uTime * 3.0) + 11.0);
+  float tear = (1.0 - smoothstep(0.0, 0.025, abs(vUv.y - tearY))) * burst;
+  vec2 luv = suv + vec2(jit + tear * uJit * 2.5, 0.0);
+  vec2 caOff = (luv - 0.5) * uCA;
+  vec3 light = vec3(texture2D(tTrail, luv + caOff).r,
+                    texture2D(tTrail, luv).g,
+                    texture2D(tTrail, luv - caOff).b) * uOutInv;
+  light += texture2D(tBloom, suv).rgb * uBloomAmt * uOutInv;
+  float inside = smoothstep(0.0, 0.01, luv.x) * (1.0 - smoothstep(0.99, 1.0, luv.x))
+               * smoothstep(0.0, 0.01, luv.y) * (1.0 - smoothstep(0.99, 1.0, luv.y));
+  light *= inside;
+  float scan = 0.5 + 0.5 * sin(gl_FragCoord.y * 3.14159265 / (1.5 * uDpr));
+  light *= 1.0 - uScan * scan;
+  light *= 1.0 - 0.38 * edge;
+  vec3 mapped = 1.0 - exp(-light * uExposure);   // tone map: hot spots roll off instead of clipping
+
+  // ---- internal graticule on the lattice plane: it cannot drift off the dots ----
+  vec2 dsg = toDesign(suv);
+  vec2 fw = fwidth(dsg);
+  float hw = uDpr * (0.5 + 1.1 * edge);
+  vec2 g = abs(fract(dsg / uCell + 0.5) - 0.5) * uCell;
+  float gline = max(aaLine(g.x, fw.x, hw), aaLine(g.y, fw.y, hw));
+  float axis = max(aaLine(abs(dsg.x), fw.x, hw), aaLine(abs(dsg.y), fw.y, hw));
+  float minor = uCell / 5.0;
+  vec2 mt = abs(fract(dsg / minor + 0.5) - 0.5) * minor;
+  float tickLen = uCell * 0.05;
+  float ticks = max(aaLine(mt.x, fw.x, hw) * (1.0 - smoothstep(tickLen, tickLen + fw.y, abs(dsg.y))),
+                    aaLine(mt.y, fw.y, hw) * (1.0 - smoothstep(tickLen, tickLen + fw.x, abs(dsg.x))));
+  float gratA = uGratA * (gline + axis * 0.6 + ticks * 0.9) / (1.0 + 1.2 * edge);
+  gratA *= 1.0 - 0.35 * smoothstep(0.85, 1.1, rn);
+  gratA *= 1.0 - uTopFade * smoothstep(0.78, 1.0, vUv.y);
+
+  // ---- x0 frame: corner brackets that dissolve once the jump starts ----
+  vec2 q = abs(dsg) - (uLat.xy + uLat.w);
+  float armL = uCell * 0.3;
+  float hArm = aaLine(abs(q.y), fw.y, hw) * (1.0 - smoothstep(0.0, fw.x, q.x)) * smoothstep(-armL - fw.x, -armL, q.x);
+  float vArm = aaLine(abs(q.x), fw.x, hw) * (1.0 - smoothstep(0.0, fw.y, q.y)) * smoothstep(-armL - fw.y, -armL, q.y);
+  float brA = max(hArm, vArm) * uLat.z * 0.7;
+  vec2 ob = abs(dsg - uObs.xy) - uObs.zw;
+  brA *= smoothstep(0.05, 0.25, length(max(ob, 0.0)) + min(max(ob.x, ob.y), 0.0));  // brackets yield to text
+
+  // ---- probe reticle: drawn in the same distorted space as the loupe it bounds ----
+  vec2 pd = dsg - uProbe.xy;
+  float pr = length(pd);
+  float ring = aaLine(abs(pr - uLoupeR), fwidth(pr), hw);
+  float tk = uLoupeR * 0.16;
+  float spanX = smoothstep(uLoupeR - fw.x, uLoupeR, abs(pd.x)) * (1.0 - smoothstep(uLoupeR + tk, uLoupeR + tk + fw.x, abs(pd.x)));
+  float spanY = smoothstep(uLoupeR - fw.y, uLoupeR, abs(pd.y)) * (1.0 - smoothstep(uLoupeR + tk, uLoupeR + tk + fw.y, abs(pd.y)));
+  float tks = max(aaLine(abs(pd.y), fw.y, hw) * spanX, aaLine(abs(pd.x), fw.x, hw) * spanY);
+  float retA = (ring * 0.5 + tks * 0.8) * uProbe.z;
+
+  vec3 col = uBg;
+  col = mix(col, uGratCol, clamp(gratA, 0.0, 1.0));
+  col = mix(col, uAnnot, clamp(brA, 0.0, 1.0));
+  col = 1.0 - (1.0 - col) * (1.0 - mapped);
+  col = mix(col, uReticle, clamp(retA, 0.0, 1.0));
+  gl_FragColor = vec4(col, 1.0);
+}
+</script>
+<script type="x-shader/x-vertex" id="vsMark">
+attribute vec4 aData;            // kind, param, lateral offset, unused
+attribute vec3 aSeed;
+uniform float uTime;
+uniform vec2  uMouse;
+uniform float uStrength;
+uniform float uLoupeR;
+uniform float uUnitPx;
+uniform float uMinPx;
+varying vec3 vCol;
+varying float vAlpha;
+const vec2 CEN = vec2(130.0, 130.0);
+vec2 bez(float t){
+  float u = 1.0 - t;
+  return u*u*u*vec2(4.0, 250.0) + 3.0*u*u*t*vec2(66.0, 238.0) + 3.0*u*t*t*vec2(94.0, 198.0) + t*t*t*vec2(116.0, 152.0);
+}
+vec2 bezD(float t){
+  float u = 1.0 - t;
+  return 3.0*u*u*vec2(62.0, -12.0) + 6.0*u*t*vec2(28.0, -40.0) + 3.0*t*t*vec2(22.0, -46.0);
+}
+void main(){
+  float kind = aData.x;
+  vec2 pos;
+  float size = 1.4;
+  float alpha = 1.0;
+  vec3 col = vec3(0.498, 0.627, 1.0);
+  float jitter = aSeed.y - 0.5;
+  if (kind < 0.5) {                       // outer ring, faint
+    float ang = aData.y - uTime * 0.03;
+    pos = CEN + vec2(cos(ang), sin(ang)) * (84.0 + jitter * 1.6);
+    col = vec3(0.91, 0.894, 0.855); alpha = 0.22; size = 1.3;
+  } else if (kind < 1.5) {                // mid ring
+    float ang = aData.y + uTime * 0.06;
+    pos = CEN + vec2(cos(ang), sin(ang)) * (52.0 + jitter * 1.4);
+    alpha = 0.5;
+  } else if (kind < 2.5) {                // inner ring
+    float ang = aData.y + uTime * 0.16;
+    pos = CEN + vec2(cos(ang), sin(ang)) * (22.0 + jitter * 0.9);
+    alpha = 0.95;
+  } else if (kind < 3.5) {                // orbiting body with a comet tail, 16 s period as before
+    float lag = aData.y;
+    float ang = uTime * 6.2831853 / 16.0 - lag * 0.9;
+    pos = CEN + vec2(cos(ang), sin(ang)) * 52.0 + (aSeed.xz - 0.5) * (1.2 + lag * 2.6) * 2.0;
+    alpha = (1.0 - lag) * 0.95; size = mix(2.0, 1.2, lag);
+    col = mix(vec3(0.863, 0.898, 1.0), vec3(0.498, 0.627, 1.0), lag);
+  } else if (kind < 4.5) {                // approach stream arriving from the page's flow
+    float t = fract(aData.y + uTime * 0.07);
+    vec2 d = normalize(bezD(t));
+    pos = bez(t) + vec2(-d.y, d.x) * aData.z * (1.0 - 0.7 * t);
+    alpha = smoothstep(0.0, 0.12, t) * (1.0 - smoothstep(0.86, 1.0, t)) * 0.85;
+    col = mix(vec3(0.173, 0.357, 1.0), vec3(0.498, 0.627, 1.0), t);
+  } else {                                // core
+    pos = CEN + (aSeed.xy - 0.5) * 5.0;
+    alpha = 0.6 + 0.4 * sin(uTime * 2.0 + aSeed.z * 30.0);
+    col = vec3(0.863, 0.898, 1.0); size = 1.3;
+  }
+  vec2 dm = pos - uMouse;
+  float xr = length(dm) / uLoupeR;
+  float mag = 1.0;
+  if (xr < 1.0) {
+    float w = (1.0 - xr) * (1.0 - xr);
+    mag = 1.0 + 1.1 * uStrength * w;
+    pos = uMouse + dm * mag;
+    alpha += w * uStrength * 0.3;
+  }
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 0.0, 1.0);
+  gl_PointSize = max(size * mag * uUnitPx, uMinPx);
+  vCol = col;
+  vAlpha = alpha;
+}
+</script>
+<script type="x-shader/x-fragment" id="fsMark">
+varying vec3 vCol;
+varying float vAlpha;
+void main(){
+  float d = length(gl_PointCoord - 0.5);
+  float a = (1.0 - smoothstep(0.16, 0.5, d)) * vAlpha;
+  if (a < 0.004) discard;
+  gl_FragColor = vec4(vCol * a, a);
+}
+</script>
 <script>
 (function(){
   "use strict";
@@ -867,39 +1286,57 @@ footer a:hover{ color:var(--bone); }
   var hasThree = typeof THREE !== "undefined";
   if (hasGSAP && typeof ScrollTrigger !== "undefined") gsap.registerPlugin(ScrollTrigger);
 
+  function clamp01(x){ return x < 0 ? 0 : (x > 1 ? 1 : x); }
+  function smooth(a, b, x){ var t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); }
+  function src(id){ var el = document.getElementById(id); return el ? el.textContent : ""; }
+  function signed(v){ return (v < 0 ? "\u2212" : "+") + Math.abs(v).toFixed(2); }
+
+  /* every render loop idles while the tab is hidden */
+  var pageHidden = !!document.hidden;
+  document.addEventListener("visibilitychange", function(){ pageHidden = !!document.hidden; });
+
+  /* one shared pointer record for the hero probe and the contact mark */
+  var ptr = { x: -1e5, y: -1e5, active: false };
+  window.addEventListener("pointermove", function(e){
+    if (e.pointerType === "touch") return;
+    ptr.x = e.clientX; ptr.y = e.clientY; ptr.active = true;
+  }, { passive: true });
+  document.addEventListener("pointerout", function(e){ if (!e.relatedTarget) ptr.active = false; });
+  function onTouch(e){ if (e.touches.length) { ptr.x = e.touches[0].clientX; ptr.y = e.touches[0].clientY; ptr.active = true; } }
+  window.addEventListener("touchstart", onTouch, { passive: true });
+  window.addEventListener("touchmove", onTouch, { passive: true });
+  window.addEventListener("touchend", function(){ ptr.active = false; });
+
   /* ============================================================
-     PARTICLE FIELD — pain → gain
-     state A: dull ordered grid (x₀)
-     mid:     turbulence bell (the messy middle)
+     PARTICLE FIELD: pain → gain
+     state A: ordered lattice on the graticule (x₀)
+     mid:     curl-noise turbulence (the messy middle)
      state B: ascending trajectory + x₁ halo
-     driver:  pinned scroll scrub + pointer turbulence
+     pipeline: points → phosphor persistence → selective bloom → CRT composite
   ============================================================ */
+  var hero = document.getElementById("top");
   var canvas = document.getElementById("field");
   var tEl = document.getElementById("tval");
   var stages = Array.prototype.slice.call(document.querySelectorAll(".hero-hud .stage"));
   var progressObj = { t: 0 };
-  var curStage = 0;
-  var heroEl = document.getElementById("top");
 
   function setStage(t){
     var idx = t < 0.34 ? 0 : (t < 0.72 ? 1 : 2);
-    curStage = idx;
     for (var i = 0; i < stages.length; i++) {
       var si = parseInt(stages[i].getAttribute("data-stage"), 10);
       stages[i].classList.toggle("is-on", si === idx);
     }
-    if (heroEl) heroEl.classList.toggle("can-ripple", idx === 2 && !reduced);
     if (tEl) tEl.textContent = t.toFixed(2);
   }
 
-  /* ---- CRT grid: barrel-curved gridlines (quadratic bow away from center) ---- */
-  var gridWrap = document.getElementById("crtWrap");
+  /* ---- SVG CRT grid: kept as the fallback when WebGL is unavailable ---- */
   var gridSharp = document.getElementById("crtGrid");
   var gridBlur = document.getElementById("crtGridBlur");
+  var gridWrap = document.getElementById("crtWrap");
   if (gridSharp) {
     var NS = "http://www.w3.org/2000/svg", segs = [];
     for (var gx = 0; gx <= 1200; gx += 100) {
-      var cxq = gx + 0.10 * (gx - 600); /* mid-bulge = 5% of distance from center */
+      var cxq = gx + 0.10 * (gx - 600);
       segs.push("M" + gx + ",-40 Q" + cxq.toFixed(1) + ",400 " + gx + ",840");
     }
     for (var gy = 0; gy <= 800; gy += 100) {
@@ -916,40 +1353,87 @@ footer a:hover{ color:var(--bone); }
     if (gridBlur) gridBlur.appendChild(gp.cloneNode(false));
   }
 
+  var fieldOK = false;
   if (hasThree && canvas) {
+    try { fieldOK = initField(); }
+    catch (err) { if (window.console) console.warn("field fallback:", err); fieldOK = false; }
+  }
+  if (fieldOK) {
+    hero.classList.add("gl-on");
+  } else if (gridWrap && !reduced) {
+    /* fallback keeps the original counter-parallax on the SVG glass */
+    var fgx = 0, fgy = 0, ftx = 0, fty = 0;
+    window.addEventListener("pointermove", function(e){
+      ftx = e.clientX / window.innerWidth - 0.5; fty = e.clientY / window.innerHeight - 0.5;
+    }, { passive: true });
+    (function tick(){
+      requestAnimationFrame(tick);
+      fgx += (ftx - fgx) * 0.05; fgy += (fty - fgy) * 0.05;
+      gridWrap.style.transform = "translate(" + (-fgx * 26).toFixed(2) + "px," + (-fgy * 18).toFixed(2) + "px) scale(1.08)";
+    })();
+  }
+
+  function initField(){
     var isMobile = window.matchMedia("(max-width: 760px)").matches || ("ontouchstart" in window && window.innerWidth < 1000);
+    var hoverNone = window.matchMedia("(hover: none)").matches;
     var COUNT = isMobile ? 6500 : 16000;
+    var BASE_Z = 14, FOV = 50, W = 12, H = 8;
+    var CELL = 1.25;           /* graticule division, in design units */
+    var LX = 5.0, LY = 2.5;    /* x₀ lattice half extents: exactly 4 × 2 divisions each side */
+    var K = 0.085;             /* barrel curvature of the screen glass */
+    var bloomDiv = 4;
 
     var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: false, alpha: true, powerPreference: "high-performance" });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2));
+    var gl = renderer.getContext();
+    var levels = isMobile ? [1.5, 1.25, 1] : [2, 1.5, 1.25, 1];
+    var devDpr = window.devicePixelRatio || 1;
+    var qi = 0;
+    while (qi < levels.length - 1 && levels[qi] > devDpr) qi++;
+    renderer.setPixelRatio(Math.min(devDpr, levels[qi]));
+    renderer.setClearColor(0x000000, 0);
 
     var scene = new THREE.Scene();
-    var BASE_Z = 14; /* reference distance for fitting and pointer math — the intro zoom animates around it */
-    var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    var camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 100);
     camera.position.set(0, 0, BASE_Z);
+    var group = new THREE.Group();
+    scene.add(group);
 
-    /* ---- build attribute data in a normalized 12 × 8 design space ---- */
-    var W = 12, H = 8;
+    function fitFor(w, h){
+      var visH = 2 * Math.tan((FOV * Math.PI / 180) / 2) * BASE_Z;
+      var visW = visH * (w / h);
+      return { s: Math.min(visW / (W + 1.0), visH / (H + 1.0)), visH: visH };
+    }
+
+    /* ---- lattice density: dots land 12 to 19 px apart, so order reads as order, not grain ---- */
+    var cw0 = canvas.clientWidth || window.innerWidth, ch0 = canvas.clientHeight || window.innerHeight;
+    var f0 = fitFor(cw0, ch0);
+    var cellPx = CELL * (ch0 / f0.visH) * f0.s;
+    var sub = cellPx / 8 >= 9 ? 8 : (cellPx / 4 >= 9 ? 4 : 2);
+    /* small screens: a double-size graticule division keeps the grid as calm as the original */
+    var GM = cellPx < 60 ? 2 : 1, GCELL = CELL * GM;
+    var step = CELL / sub;
+    var nx = Math.round(2 * LX / step) + 1, ny = Math.round(2 * LY / step) + 1;
+    var nPts = nx * ny;
+
     var grid = new Float32Array(COUNT * 3);
     var target = new Float32Array(COUNT * 3);
     var seed = new Float32Array(COUNT * 3);
+    var info = new Float32Array(COUNT * 4);
 
-    // x₀ grid: cold ordered lattice, slightly tilted in z
-    var cols = Math.ceil(Math.sqrt(COUNT * (W / H)));
-    var rows = Math.ceil(COUNT / cols);
-    var gi = 0;
-    for (var r = 0; r < rows && gi < COUNT; r++) {
-      for (var c = 0; c < cols && gi < COUNT; c++) {
-        var gx = (c / (cols - 1) - 0.5) * W * 0.92;
-        var gy = (r / (rows - 1) - 0.5) * H * 0.78;
-        grid[gi*3]   = gx;
-        grid[gi*3+1] = gy;
-        grid[gi*3+2] = -1.2 + gx * 0.06 + (Math.random() - 0.5) * 0.12;
-        gi++;
-      }
+    /* random permutation: one visible particle per lattice point, the rest wait there unseen */
+    var perm = new Uint32Array(COUNT), i;
+    for (i = 0; i < COUNT; i++) perm[i] = i;
+    for (i = COUNT - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), tmp = perm[i]; perm[i] = perm[j]; perm[j] = tmp; }
+    for (i = 0; i < COUNT; i++) {
+      var li = perm[i] % nPts, ix = li % nx, iy = (li / nx) | 0;
+      grid[i*3]   = -LX + ix * step;
+      grid[i*3+1] = -LY + iy * step;
+      grid[i*3+2] = 0;
+      info[i*4+2] = perm[i] < nPts ? 1 : 0;
+      info[i*4+3] = (ix % (sub * GM) === 0 && iy % (sub * GM) === 0) ? 1 : 0;
     }
 
-    // x₁ trajectory: the jump curve + endpoint halo
+    /* x₁ trajectory: the jump curve + endpoint halo (unchanged shape) */
     function gauss(){ return (Math.random()+Math.random()+Math.random()+Math.random()-2) * 0.5; }
     var endX = W * 0.42, k = 2.9, denom = Math.exp(k) - 1;
     var dipC = 0.22, dipW = 0.18, dipA = H * 0.10;
@@ -958,235 +1442,213 @@ footer a:hover{ color:var(--bone); }
       var dip = dipA * Math.exp(-Math.pow(t - dipC, 2) / (2 * dipW * dipW));
       return rise - dip;
     }
-
     var haloCount = Math.floor(COUNT * 0.085);
     var endY = curveY(1);
-    for (var i = 0; i < COUNT; i++) {
+    for (i = 0; i < COUNT; i++) {
       if (i < COUNT - haloCount) {
-        // bias sampling toward the end of the curve (density compounds)
         var t = Math.pow(Math.random(), 0.62);
-        var x = -endX + t * (endX * 2);
-        var y = curveY(t);
-        // band thickness narrows as confidence grows
         var thick = (1.0 - 0.68 * t) * 0.85 + 0.05;
-        // local tangent for a slight along-curve smear
-        target[i*3]   = x + gauss() * 0.22;
-        target[i*3+1] = y + gauss() * thick;
+        target[i*3]   = -endX + t * (endX * 2) + gauss() * 0.22;
+        target[i*3+1] = curveY(t) + gauss() * thick;
         target[i*3+2] = gauss() * 0.5 * (1.0 - 0.5*t);
+        info[i*4] = t; info[i*4+1] = 0;
       } else {
-        // halo ring around x₁
         var a = Math.random() * Math.PI * 2;
         var rad = 0.95 + gauss() * 0.045;
         target[i*3]   = endX + Math.cos(a) * rad;
         target[i*3+1] = endY + Math.sin(a) * rad * 0.96;
         target[i*3+2] = gauss() * 0.1;
+        info[i*4] = 1; info[i*4+1] = 1;
       }
-      seed[i*3]   = Math.random();
-      seed[i*3+1] = Math.random();
-      seed[i*3+2] = Math.random();
+      seed[i*3] = Math.random(); seed[i*3+1] = Math.random(); seed[i*3+2] = Math.random();
     }
 
     var geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(grid.slice(0), 3)); // required by three; shader uses aGrid/aTarget
+    geo.setAttribute("position", new THREE.BufferAttribute(grid.slice(0), 3));
     geo.setAttribute("aGrid",   new THREE.BufferAttribute(grid, 3));
     geo.setAttribute("aTarget", new THREE.BufferAttribute(target, 3));
     geo.setAttribute("aSeed",   new THREE.BufferAttribute(seed, 3));
+    geo.setAttribute("aInfo",   new THREE.BufferAttribute(info, 4));
 
-    var uniforms = {
+    var u = {
       uProgress:      { value: 0 },
       uTime:          { value: 0 },
-      uMouse:         { value: new THREE.Vector3(99, 99, 0) },
+      uMouse:         { value: new THREE.Vector2(99, 99) },
       uMouseStrength: { value: 0 },
       uSize:          { value: isMobile ? 0.10 : 0.085 },
       uScale:         { value: 450.0 },
       uIntro:         { value: 1.0 },
+      uDrift:         { value: reduced ? 0 : 1 },
+      uCamD:          { value: 10 },
+      uFocus:         { value: 0 },
+      uCocK:          { value: isMobile ? 0.35 : 0.5 },
+      uObsC:          { value: new THREE.Vector2(0, 0) },
+      uObsH:          { value: new THREE.Vector2(0, 0) },
+      uObsPush:       { value: 0 },
+      uObsDim:        { value: 0 },
+      uLoupeR:        { value: 0.9 },
+      uLoupeA:        { value: 1.1 },
+      uPass:          { value: 0 },
+      uOut:           { value: 1 },
       uColGrid:       { value: new THREE.Color("#55617A") },
+      uColInter:      { value: new THREE.Color("#A3AEC4") },
       uColChaos:      { value: new THREE.Color("#E0562E") },
       uColGain:       { value: new THREE.Color("#5E86FF") },
-      uColHot:        { value: new THREE.Color("#DCE5FF") },
-      uRippleCenter:  { value: new THREE.Vector2(0, 0) },
-      uRippleT:       { value: -1.0 }
+      uColHot:        { value: new THREE.Color("#DCE5FF") }
     };
-
     var mat = new THREE.ShaderMaterial({
-      uniforms: uniforms,
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      vertexShader: [
-        "attribute vec3 aGrid;",
-        "attribute vec3 aTarget;",
-        "attribute vec3 aSeed;",
-        "uniform float uProgress;",
-        "uniform float uTime;",
-        "uniform vec3  uMouse;",
-        "uniform float uMouseStrength;",
-        "uniform float uSize;",
-        "uniform float uScale;",
-        "uniform float uIntro;",
-        "uniform vec2  uRippleCenter;",
-        "uniform float uRippleT;",
-        "varying float vPhase;",
-        "varying float vChaos;",
-        "varying float vSeed;",
-        "varying float vHot;",
-        "varying float vIntro;",
-        "varying float vRip;",
-        "float ease(float t){ return t*t*(3.0-2.0*t); }",
-        "void main(){",
-        "  float stag = aSeed.x * 0.30;",
-        "  float p = clamp((uProgress - stag) / max(1.0 - 0.30, 0.0001), 0.0, 1.0);",
-        "  float m = ease(p);",
-        "  vec3 pos = mix(aGrid, aTarget, m);",
-        "  // idle drift — the field breathes",
-        "  pos.x += sin(uTime*0.5 + aSeed.y*43.0) * 0.05;",
-        "  pos.y += cos(uTime*0.42 + aSeed.z*37.0) * 0.05;",
-        "  // turbulence bell — peaks mid-trajectory",
-        "  float bell = sin(3.14159265 * clamp(uProgress, 0.0, 1.0));",
-        "  bell = bell * bell;",
-        "  float amp = bell * (0.55 + aSeed.z * 0.9);",
-        "  pos.x += sin(uTime*1.6 + aSeed.x*97.0 + pos.y*0.9) * amp * 1.35;",
-        "  pos.y += cos(uTime*1.35 + aSeed.y*113.0 + pos.x*0.8) * amp * 1.15;",
-        "  pos.z += sin(uTime*1.1 + aSeed.z*71.0 + pos.x*0.5) * amp * 0.9;",
-        "  // pointer magnetism — gentle pull + soft swirl, dead zone at center",
-        "  vec2 d = uMouse.xy - pos.xy;",
-        "  float dist = length(d);",
-        "  float fall = exp(-dist * dist * 0.28) * uMouseStrength;",
-        "  float pull = fall * smoothstep(0.0, 0.55, dist);",
-        "  vec2 dir = dist > 0.0001 ? d / dist : vec2(0.0);",
-        "  vec2 swirl = vec2(-dir.y, dir.x);",
-        "  pos.xy += dir * pull * (0.5 + aSeed.y * 0.35) + swirl * fall * 0.25;",
-        "  // birth: each particle drifts in from a random offset, staggered, fading from zero",
-        "  float ip = clamp((uIntro - aSeed.y * 0.55) / 0.45, 0.0, 1.0);",
-        "  float ie = ip * ip * (3.0 - 2.0 * ip);",
-        "  vec3 scatter = (vec3(aSeed.y, aSeed.z, aSeed.x) * 2.0 - 1.0) * vec3(9.0, 6.0, 4.0);",
-        "  pos += scatter * (1.0 - ie);",
-        "  // click ripple — an expanding ring of displacement pushing particles outward as it passes",
-        "  vRip = 0.0;",
-        "  if (uRippleT >= 0.0) {",
-        "    vec2 rd = pos.xy - uRippleCenter;",
-        "    float rdist = length(rd);",
-        "    float front = uRippleT * 7.0;",
-        "    float ring = rdist - front;",
-        "    float band = exp(-ring * ring * 1.4);",
-        "    float decay = exp(-uRippleT * 1.6);",
-        "    vec2 rdir = rdist > 0.0001 ? rd / rdist : vec2(0.0);",
-        "    float amt = band * decay;",
-        "    pos.xy += rdir * amt * 0.95;",
-        "    pos.z  += sin(rdist * 3.0 - uRippleT * 10.0) * amt * 0.4;",
-        "    vRip = amt;",
-        "  }",
-        "  vIntro = ie;",
-        "  vPhase = m;",
-        "  vChaos = bell;",
-        "  vSeed = aSeed.x;",
-        "  vHot = fall;",
-        "  vec4 mv = modelViewMatrix * vec4(pos, 1.0);",
-        "  gl_Position = projectionMatrix * mv;",
-        "  float sz = uSize * (0.55 + aSeed.y * 0.9 + fall * 0.7 + bell * 0.35 + vRip * 0.8);",
-        "  gl_PointSize = sz * uScale / max(-mv.z, 0.1);",
-        "}"
-      ].join("\n"),
-      fragmentShader: [
-        "uniform vec3 uColGrid;",
-        "uniform vec3 uColChaos;",
-        "uniform vec3 uColGain;",
-        "uniform vec3 uColHot;",
-        "varying float vPhase;",
-        "varying float vChaos;",
-        "varying float vSeed;",
-        "varying float vHot;",
-        "varying float vIntro;",
-        "varying float vRip;",
-        "void main(){",
-        "  vec2 uv = gl_PointCoord - 0.5;",
-        "  float d = length(uv);",
-        "  float a = smoothstep(0.5, 0.16, d);",
-        "  vec3 col = mix(uColGrid, uColGain, vPhase);",
-        "  col = mix(col, uColChaos, vChaos * (0.25 + 0.55 * vSeed));",
-        "  col = mix(col, uColHot, clamp(vHot, 0.0, 1.0) * 0.8);",
-        "  col = mix(col, uColHot, clamp(vRip, 0.0, 1.0));",
-        "  float alpha = a * (0.34 + 0.5 * vPhase + 0.25 * vChaos + 0.3 * vHot + 0.6 * vRip) * vIntro;",
-        "  if (alpha < 0.015) discard;",
-        "  gl_FragColor = vec4(col, alpha);",
-        "}"
-      ].join("\n")
+      uniforms: u,
+      vertexShader: src("vsField"),
+      fragmentShader: src("fsField"),
+      transparent: true, depthWrite: false, depthTest: false,
+      blending: THREE.CustomBlending,
+      blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneFactor,
+      blendSrcAlpha: THREE.OneFactor, blendDstAlpha: THREE.OneFactor
     });
-
     var points = new THREE.Points(geo, mat);
-    var group = new THREE.Group();
+    points.frustumCulled = false;
     group.add(points);
-    scene.add(group);
 
-    /* ---- fit normalized space to viewport ---- */
-    function resize(){
-      var w = canvas.clientWidth || window.innerWidth;
-      var h = canvas.clientHeight || window.innerHeight;
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      var visH = 2 * Math.tan((camera.fov * Math.PI / 180) / 2) * BASE_Z;
-      var visW = visH * camera.aspect;
-      /* generous but safe: margin covers the x₁ halo and the camera parallax drift */
-      var s = Math.min(visW / (W + 1.0), visH / (H + 1.0));
-      group.scale.set(s, s, s);
-      uniforms.uScale.value = (h * renderer.getPixelRatio()) * 0.5;
+    /* ---- render targets: half-float when the GPU can render to it, 8-bit otherwise ---- */
+    var ext = renderer.extensions, caps = renderer.capabilities;
+    var hdr = caps.isWebGL2 ? ext.has("EXT_color_buffer_float")
+      : (ext.has("OES_texture_half_float") && ext.has("OES_texture_half_float_linear") && ext.has("EXT_color_buffer_half_float"));
+    var rts = [];
+    function makeTargets(type){
+      rts.forEach(function(r){ r.dispose(); });
+      rts = [];
+      for (var n = 0; n < 5; n++) {
+        rts.push(new THREE.WebGLRenderTarget(4, 4, {
+          minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
+          format: THREE.RGBAFormat, type: type, depthBuffer: false, stencilBuffer: false
+        }));
+      }
     }
+    makeTargets(hdr ? THREE.HalfFloatType : THREE.UnsignedByteType);
+    if (hdr) {
+      renderer.setRenderTarget(rts[0]);
+      var fbOK = gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE;
+      renderer.setRenderTarget(null);
+      if (!fbOK) { hdr = false; makeTargets(THREE.UnsignedByteType); }
+    }
+    var outScale = hdr ? 1 : 0.5;  /* 8-bit targets get headroom so dense areas still tone-map */
+    u.uOut.value = outScale;
+    var rtScene = rts[0], trailA = rts[1], trailB = rts[2], bloomA = rts[3], bloomB = rts[4];
+
+    var quadScene = new THREE.Scene();
+    var quadCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    function quadMat(fs, uniforms, derivatives){
+      var m = new THREE.ShaderMaterial({ uniforms: uniforms, vertexShader: src("vsQuad"), fragmentShader: src(fs), depthTest: false, depthWrite: false });
+      if (derivatives) m.extensions = { derivatives: true };
+      return m;
+    }
+    var trailMat = quadMat("fsTrail", { tScene: { value: null }, tPrev: { value: null }, uDecay: { value: 0 } });
+    var blurMat = quadMat("fsBlur", { tSrc: { value: null }, uDir: { value: new THREE.Vector2() } });
+    var cu = {
+      tTrail: { value: null }, tBloom: { value: null },
+      uInvPVM: { value: new THREE.Matrix4() },
+      uAspect: { value: 1 }, uK: { value: K }, uCA: { value: 0 }, uJit: { value: 0 },
+      uTime: { value: 0 }, uOutInv: { value: 1 / outScale }, uExposure: { value: 1.55 },
+      uBloomAmt: { value: 0.85 }, uDpr: { value: 1 }, uCell: { value: GCELL }, uTopFade: { value: 0 },
+      uLat: { value: new THREE.Vector4(LX, LY, 1, step * 0.9) },
+      uGlass: { value: new THREE.Vector2() },
+      uProbe: { value: new THREE.Vector3(99, 99, 0) },
+      uLoupeR: { value: 0.9 }, uScan: { value: 0.08 }, uGratA: { value: 0.075 },
+      uObs: { value: new THREE.Vector4(0, 0, 0, 0) },
+      uBg: { value: new THREE.Color("#0B1322") },
+      uGratCol: { value: new THREE.Color("#E8E4DA") },
+      uAnnot: { value: new THREE.Color("#7E8AA0") },
+      uReticle: { value: new THREE.Color("#7FA0FF") }
+    };
+    var compMat = quadMat("fsComposite", cu, true);
+    var quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), trailMat);
+    quad.frustumCulled = false;
+    quadScene.add(quad);
+    function pass(m, rt){ quad.material = m; renderer.setRenderTarget(rt); renderer.render(quadScene, quadCam); }
+
+    /* ---- geometry of the glass: screen ↔ lattice plane, through the barrel ---- */
+    var PVM = new THREE.Matrix4(), invPVM = cu.uInvPVM.value;
+    var va = new THREE.Vector3(), vb = new THREE.Vector3();
+    var cssW = 1, cssH = 1, aspect = 1, pr = 1, mainScale = 450, pxPerUnit = 100;
+    function canvasToDesign(px, py, out){
+      var ux = px / cssW, uy = 1 - py / cssH;
+      var ax = (ux - 0.5) * aspect, ay = uy - 0.5, f = 1 + K * (ax * ax + ay * ay);
+      ux = ax * f / aspect + 0.5; uy = ay * f + 0.5;
+      va.set(ux * 2 - 1, uy * 2 - 1, -1).applyMatrix4(invPVM);
+      vb.set(ux * 2 - 1, uy * 2 - 1,  1).applyMatrix4(invPVM);
+      var kk = -va.z / (vb.z - va.z);
+      out.x = va.x + (vb.x - va.x) * kk; out.y = va.y + (vb.y - va.y) * kk;
+      return out;
+    }
+    function designToCanvas(x, y, out){
+      va.set(x, y, 0).applyMatrix4(PVM);
+      var sx = va.x * 0.5 * aspect, sy = va.y * 0.5, cx = sx, cy = sy;
+      for (var n = 0; n < 4; n++) { var f = 1 + K * (cx * cx + cy * cy); cx = sx / f; cy = sy / f; }
+      out.x = (cx / aspect + 0.5) * cssW; out.y = (0.5 - cy) * cssH;
+      return out;
+    }
+
+    /* ---- the headline's tight text box, measured relative to the canvas ---- */
+    var heroInner = document.querySelector(".hero-inner");
+    var textBox = null;
+    function measureText(){
+      if (!heroInner) return;
+      var cr = canvas.getBoundingClientRect();
+      var l = Infinity, tp = Infinity, r = -Infinity, b = -Infinity;
+      for (var c = 0; c < heroInner.children.length; c++) {
+        var rg = document.createRange();
+        rg.selectNodeContents(heroInner.children[c]);
+        var rs = rg.getClientRects();
+        for (var q = 0; q < rs.length; q++) {
+          if (rs[q].width < 1) continue;
+          l = Math.min(l, rs[q].left); tp = Math.min(tp, rs[q].top);
+          r = Math.max(r, rs[q].right); b = Math.max(b, rs[q].bottom);
+        }
+      }
+      if (r > l) textBox = { l: l - cr.left, t: tp - cr.top, r: r - cr.left, b: b - cr.top };
+    }
+
+    function resize(){
+      cssW = canvas.clientWidth || window.innerWidth;
+      cssH = canvas.clientHeight || window.innerHeight;
+      aspect = cssW / cssH;
+      renderer.setSize(cssW, cssH, false);
+      pr = renderer.getPixelRatio();
+      camera.aspect = aspect;
+      camera.updateProjectionMatrix();
+      var fit = fitFor(cssW, cssH);
+      group.scale.set(fit.s, fit.s, fit.s);
+      pxPerUnit = (cssH / fit.visH) * fit.s;
+      var dw = Math.max(1, Math.floor(cssW * pr)), dh = Math.max(1, Math.floor(cssH * pr));
+      rtScene.setSize(dw, dh); trailA.setSize(dw, dh); trailB.setSize(dw, dh);
+      var bw = Math.max(1, Math.floor(dw / bloomDiv)), bh = Math.max(1, Math.floor(dh / bloomDiv));
+      bloomA.setSize(bw, bh); bloomB.setSize(bw, bh);
+      /* glow radius and strength follow the composition's scale, not raw pixels */
+      var gk = Math.max(0.4, Math.min(1, pxPerUnit / 100));
+      blurTexel.set(gk / bw, gk / bh);
+      cu.uBloomAmt.value = 0.85 * (0.35 + 0.65 * gk);
+      mainScale = dh * 0.5;
+      u.uCamD.value = BASE_Z / fit.s;
+      var R = Math.max(0.9, 55 / pxPerUnit);
+      u.uLoupeR.value = R; cu.uLoupeR.value = R;
+      cu.uAspect.value = aspect; cu.uDpr.value = pr;
+      cu.uTopFade.value = canvas.getBoundingClientRect().top - hero.getBoundingClientRect().top > 1 ? 1 : 0;
+      measureText();
+    }
+    var blurTexel = new THREE.Vector2(1, 1);
     resize();
     window.addEventListener("resize", resize);
+    window.addEventListener("load", measureText);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureText);
+    setTimeout(measureText, 2700); /* after the headline's entrance tween settles */
 
     /* ---- intro: particles materialize from random points, fading into the constellation ---- */
     if (hasGSAP && !reduced) {
-      uniforms.uIntro.value = 0;
-      gsap.to(uniforms.uIntro, { value: 1, duration: 2.4, ease: "power2.inOut", delay: 0.15 });
+      u.uIntro.value = 0;
+      gsap.to(u.uIntro, { value: 1, duration: 2.4, ease: "power2.inOut", delay: 0.15 });
     }
 
-    /* ---- pointer → world coords on z=0 plane ---- */
-    var mouseTarget = new THREE.Vector3(99, 99, 0);
-    var strengthTarget = 0;
-    var rippleActive = false, rippleStart = 0;
-    function pointerToWorld(clientX, clientY){
-      var rect = canvas.getBoundingClientRect();
-      var nx = ((clientX - rect.left) / rect.width) * 2 - 1;
-      var ny = -((clientY - rect.top) / rect.height) * 2 + 1;
-      var visH = 2 * Math.tan((camera.fov * Math.PI / 180) / 2) * BASE_Z;
-      var visW = visH * camera.aspect;
-      var s = group.scale.x;
-      mouseTarget.set((nx * visW / 2) / s, (ny * visH / 2) / s, 0);
-    }
-    window.addEventListener("pointermove", function(e){
-      if (e.pointerType === "touch") return;
-      pointerToWorld(e.clientX, e.clientY);
-      strengthTarget = 1;
-    }, { passive: true });
-    window.addEventListener("pointerleave", function(){ strengthTarget = 0; });
-    window.addEventListener("touchmove", function(e){
-      if (e.touches.length) { pointerToWorld(e.touches[0].clientX, e.touches[0].clientY); strengthTarget = 1; }
-    }, { passive: true });
-    window.addEventListener("touchend", function(){ strengthTarget = 0; });
-
-    /* ---- click ripple: only live once the trajectory has landed at x₁ ---- */
-    function clientToWorldXY(clientX, clientY){
-      var rect = canvas.getBoundingClientRect();
-      var nx = ((clientX - rect.left) / rect.width) * 2 - 1;
-      var ny = -((clientY - rect.top) / rect.height) * 2 + 1;
-      var vH = 2 * Math.tan((camera.fov * Math.PI / 180) / 2) * BASE_Z;
-      var vW = vH * camera.aspect;
-      var s = group.scale.x;
-      return { x: (nx * vW / 2) / s, y: (ny * vH / 2) / s };
-    }
-    if (heroEl) {
-      heroEl.addEventListener("pointerdown", function(e){
-        if (reduced || curStage !== 2) return;
-        var w = clientToWorldXY(e.clientX, e.clientY);
-        uniforms.uRippleCenter.value.set(w.x, w.y);
-        rippleStart = clock.getElapsedTime();
-        uniforms.uRippleT.value = 0.0;
-        rippleActive = true;
-      });
-    }
-
-    /* ---- camera parallax (desktop only, subtle) ---- */
+    /* ---- camera parallax (desktop only, subtle); the glass counter-drifts ---- */
     var camX = 0, camY = 0;
     if (!isMobile) {
       window.addEventListener("pointermove", function(e){
@@ -1195,59 +1657,226 @@ footer a:hover{ color:var(--bone); }
       }, { passive: true });
     }
 
+    var readout = document.getElementById("probeReadout");
+    var readoutText = "";
+    var mTarget = new THREE.Vector2(99, 99), tmp2 = new THREE.Vector2(), tmp3 = new THREE.Vector2();
+    var strength = 0;
+
     /* ---- render loop ---- */
-    var clock = new THREE.Clock();
-    var running = true;
-    var gpx = 0, gpy = 0; /* eased grid parallax */
-    function frame(){
+    var running = true, lastNow = null, elapsed = 0;
+    var gpx = 0, gpy = 0;
+    var perfAcc = 0, perfN = 0, perfWarm = 0;
+    function frame(now){
       requestAnimationFrame(frame);
-      if (!running) return;
-      var t = clock.getElapsedTime();
-      uniforms.uTime.value = t;
-      uniforms.uProgress.value = progressObj.t;
-      uniforms.uMouse.value.lerp(mouseTarget, 0.08);
-      uniforms.uMouseStrength.value += (strengthTarget - uniforms.uMouseStrength.value) * 0.06;
-      if (rippleActive) {
-        var rt = t - rippleStart;
-        uniforms.uRippleT.value = rt;
-        if (rt > 2.2) { rippleActive = false; uniforms.uRippleT.value = -1.0; }
+      if (!running || pageHidden) { lastNow = null; return; }
+      var dt = lastNow === null ? 1 / 60 : Math.min((now - lastNow) / 1000, 0.1);
+      lastNow = now;
+      elapsed += dt;
+
+      /* adaptive quality: step the pixel ratio down if frames run long, never back up */
+      perfAcc += dt; perfN++;
+      if (perfN >= 90) {
+        if (perfWarm++ >= 1 && perfAcc / perfN > 0.026 && qi < levels.length - 1) {
+          qi++;
+          renderer.setPixelRatio(Math.min(devDpr, levels[qi]));
+          resize();
+        }
+        perfAcc = 0; perfN = 0;
       }
+
+      var tp = progressObj.t;
+      var bell = Math.pow(Math.sin(Math.PI * clamp01(tp)), 2);
+      u.uTime.value = elapsed; cu.uTime.value = elapsed;
+      u.uProgress.value = tp;
+
       camera.position.x += (camX * 0.7 - camera.position.x) * 0.04;
       camera.position.y += (-camY * 0.5 - camera.position.y) * 0.04;
       camera.lookAt(0, 0, 0);
-      /* grid drifts opposite the cursor — POV through an instrument screen */
-      if (gridWrap && !reduced) {
-        gpx += (camX - gpx) * 0.05;
-        gpy += (camY - gpy) * 0.05;
-        gridWrap.style.transform = "translate(" + (-gpx * 26).toFixed(2) + "px," + (-gpy * 18).toFixed(2) + "px) scale(1.08)";
-      }
-      renderer.render(scene, camera);
-    }
-    frame();
+      camera.updateMatrixWorld();
+      group.updateMatrixWorld();
+      PVM.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse).multiply(group.matrixWorld);
+      invPVM.copy(PVM).invert();
 
-    // pause rendering when hero is far off screen
+      /* probe: pointer mapped through the glass onto the lattice plane */
+      var cr = canvas.getBoundingClientRect();
+      var ppx = ptr.x - cr.left, ppy = ptr.y - cr.top;
+      var hr = hero.getBoundingClientRect();
+      var inside = ptr.active && ptr.x >= hr.left && ptr.x <= hr.right && ptr.y >= Math.max(hr.top, 0) && ptr.y <= hr.bottom;
+      if (inside) canvasToDesign(ppx, ppy, mTarget);
+      if (inside && strength < 0.05) u.uMouse.value.copy(mTarget); /* re-entry: snap, never fly in */
+      strength += ((inside ? 1 : 0) - strength) * 0.08;
+      u.uMouse.value.lerp(mTarget, 0.2);
+      u.uMouseStrength.value = strength;
+      cu.uProbe.value.set(u.uMouse.value.x, u.uMouse.value.y, strength);
+
+      if (readout && !hoverNone) {
+        var show = strength > 0.35;
+        if (show) {
+          var R = u.uLoupeR.value * 0.72;
+          designToCanvas(u.uMouse.value.x + R, u.uMouse.value.y + R, tmp2);
+          var rx = cr.left - hr.left + tmp2.x, ry = cr.top - hr.top + tmp2.y;
+          var flip = rx > hr.width - 170;
+          if (flip) { designToCanvas(u.uMouse.value.x - R, u.uMouse.value.y + R, tmp2); rx = cr.left - hr.left + tmp2.x; }
+          readout.style.transform = "translate(" + rx.toFixed(1) + "px," + ry.toFixed(1) + "px) translate(" + (flip ? "calc(-100% - 6px)" : "6px") + ",-100%)";
+          var txt = "x " + signed(u.uMouse.value.x / GCELL) + " · y " + signed(u.uMouse.value.y / GCELL) + " div";
+          if (txt !== readoutText) { readout.textContent = txt; readoutText = txt; }
+        }
+        readout.classList.toggle("on", show);
+      }
+
+      /* headline obstacle, re-projected each frame so parallax never shifts it off the text */
+      if (textBox) {
+        canvasToDesign(textBox.l, textBox.b, tmp2);
+        canvasToDesign(textBox.r, textBox.t, tmp3);
+        u.uObsC.value.set((tmp2.x + tmp3.x) / 2, (tmp2.y + tmp3.y) / 2);
+        u.uObsH.value.set(Math.abs(tmp3.x - tmp2.x) / 2, Math.abs(tmp3.y - tmp2.y) / 2);
+        var push = smooth(0.04, 0.25, tp) * (1 - smooth(0.7, 0.92, tp));
+        u.uObsPush.value = push;
+        u.uObsDim.value = 0.3 + 0.35 * push;
+        cu.uObs.value.set(u.uObsC.value.x, u.uObsC.value.y, u.uObsH.value.x, u.uObsH.value.y);
+      }
+
+      /* focus travels from the lattice plane to x₁; signal degrades with the pain bell, clean at x₁ */
+      u.uFocus.value = 0.35 * smooth(0.55, 1.0, tp);
+      cu.uCA.value = reduced ? 0 : bell * 0.007;
+      cu.uJit.value = reduced ? 0 : bell * 0.003;
+      cu.uLat.value.z = (1 - smooth(0.02, 0.22, tp)) * u.uIntro.value;
+      if (!reduced) {
+        gpx += (camX - gpx) * 0.05; gpy += (camY - gpy) * 0.05;
+        cu.uGlass.value.set(-gpx * 26 / cssW, gpy * 18 / cssH);
+      }
+
+      /* 1. points → scene */
+      u.uPass.value = 0; u.uScale.value = mainScale;
+      renderer.setRenderTarget(rtScene);
+      renderer.render(scene, camera);
+      /* 2. phosphor persistence (frame-rate independent decay; off for reduced motion) */
+      trailMat.uniforms.tScene.value = rtScene.texture;
+      trailMat.uniforms.tPrev.value = trailA.texture;
+      trailMat.uniforms.uDecay.value = reduced ? 0 : Math.pow(0.86, dt * 60);
+      pass(trailMat, trailB);
+      var sw = trailA; trailA = trailB; trailB = sw;
+      /* 3. selective bloom: only the dense tail and the x₁ halo write into it */
+      u.uPass.value = 1; u.uScale.value = mainScale / bloomDiv;
+      renderer.setRenderTarget(bloomA);
+      renderer.render(scene, camera);
+      var dir = blurMat.uniforms.uDir.value;
+      blurMat.uniforms.tSrc.value = bloomA.texture; dir.set(blurTexel.x, 0);     pass(blurMat, bloomB);
+      blurMat.uniforms.tSrc.value = bloomB.texture; dir.set(0, blurTexel.y);     pass(blurMat, bloomA);
+      blurMat.uniforms.tSrc.value = bloomA.texture; dir.set(blurTexel.x * 2, 0); pass(blurMat, bloomB);
+      blurMat.uniforms.tSrc.value = bloomB.texture; dir.set(0, blurTexel.y * 2); pass(blurMat, bloomA);
+      /* 4. CRT composite to screen */
+      cu.tTrail.value = trailA.texture;
+      cu.tBloom.value = bloomA.texture;
+      pass(compMat, null);
+    }
+    requestAnimationFrame(frame);
+
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function(entries){
         running = entries[0].isIntersecting;
-      }, { rootMargin: "200px 0px" }).observe(document.getElementById("top"));
+      }, { rootMargin: "200px 0px" }).observe(hero);
     }
+    return true;
+  }
+
+  /* ============================================================
+     FIG. 02: the instrument (readout, markers, afterglow)
+  ============================================================ */
+  var scanEl = document.getElementById("scan");
+  var revealRect = document.getElementById("revealRect");
+  var figEl = document.querySelector(".method-figure");
+  var figSvg = figEl ? figEl.querySelector("svg") : null;
+  var fig2 = null;
+  try { fig2 = figSvg ? buildInstrument(figSvg) : null; } catch (err) { fig2 = null; }
+
+  function buildInstrument(svg){
+    var NS = "http://www.w3.org/2000/svg";
+    var pain = document.getElementById("painPath"), gain = document.getElementById("gainPath");
+    if (!pain || !gain) return null;
+    function el(tag, attrs){ var e = document.createElementNS(NS, tag); for (var a in attrs) e.setAttribute(a, attrs[a]); return e; }
+    var api = { onLayout: null };
+
+    /* afterglow: brighter copies of both curves, blurred, windowed behind the scan */
+    var defs = svg.querySelector("defs");
+    var filt = el("filter", { id: "phosphorGlow", x: "-10%", y: "-30%", width: "120%", height: "160%" });
+    filt.appendChild(el("feGaussianBlur", { stdDeviation: "3.2", result: "b" }));
+    var merge = el("feMerge");
+    merge.appendChild(el("feMergeNode", { "in": "b" }));
+    merge.appendChild(el("feMergeNode", { "in": "b" }));
+    merge.appendChild(el("feMergeNode", { "in": "SourceGraphic" }));
+    filt.appendChild(merge);
+    var grad = el("linearGradient", { id: "afterglowGrad", x1: "0", y1: "0", x2: "1", y2: "0" });
+    grad.appendChild(el("stop", { offset: "0", "stop-color": "#000" }));
+    grad.appendChild(el("stop", { offset: "0.78", "stop-color": "#6a6a6a" }));
+    grad.appendChild(el("stop", { offset: "1", "stop-color": "#fff" }));
+    var mask = el("mask", { id: "afterglowMask", maskUnits: "userSpaceOnUse", x: "0", y: "0", width: "1000", height: "560" });
+    var mrect = el("rect", { x: "0", y: "0", width: "200", height: "560", fill: "url(#afterglowGrad)" });
+    mask.appendChild(mrect);
+    defs.appendChild(filt); defs.appendChild(grad); defs.appendChild(mask);
+    var glowG = el("g", { mask: "url(#afterglowMask)", filter: "url(#phosphorGlow)" });
+    var pg = pain.cloneNode(false); pg.removeAttribute("id"); pg.setAttribute("stroke", "#FF8B5E"); pg.setAttribute("stroke-width", "3");
+    var gg = gain.cloneNode(false); gg.removeAttribute("id"); gg.setAttribute("stroke", "#A9BFFF"); gg.setAttribute("stroke-width", "3.5");
+    glowG.appendChild(pg); glowG.appendChild(gg);
+    gain.parentNode.insertBefore(glowG, gain.nextSibling);
+
+    /* ---- tall layout on mobile: the figure gets 70% more height ----
+       the plot (curves, grid, axis, scanline) stretches into the extra room between the scan's
+       end points (y 48 → 512); the chrome (corner brackets, instrument and T₀/T₁ labels) keeps its
+       size and its distance to the frame edges; circles move but stay round. */
+    var H0 = 560, TALL = 1.7, Y0 = 48, Y1 = 512;
+    var mq = window.matchMedia("(max-width: 760px)");
+    var dH = 0, kY = 1;
+    function fy(y){ return y <= Y0 ? y : (y >= Y1 ? y + dH : Y0 + (y - Y0) * kY); }
+    function edge(y){ return y > H0 / 2 ? y + dH : y; }             /* chrome: pinned to the nearer frame edge */
+    function orig(e, a){ var k = "data-o-" + a; if (!e.hasAttribute(k)) e.setAttribute(k, e.getAttribute(a)); return e.getAttribute(k); }
+    function mapD(d, fn){ return d.replace(/(-?\d*\.?\d+),(-?\d*\.?\d+)/g, function(_, x, y){ return x + "," + (+fn(+y).toFixed(2)); }); }
+    var chrome = Array.prototype.slice.call(svg.querySelectorAll('g[stroke="rgba(126,138,160,0.7)"] path'));
+    var revealR = document.getElementById("revealRect");
+    function layout(){
+      dH = mq.matches ? H0 * (TALL - 1) : 0;
+      kY = (Y1 + dH - Y0) / (Y1 - Y0);
+      var Ht = H0 + dH;
+      svg.setAttribute("viewBox", "0 0 1000 " + Ht);
+      Array.prototype.forEach.call(svg.querySelectorAll("path"), function(p){
+        if (!p.getAttribute("d")) return;
+        p.setAttribute("d", mapD(orig(p, "d"), chrome.indexOf(p) >= 0 ? edge : fy));
+      });
+      Array.prototype.forEach.call(svg.querySelectorAll("circle"), function(c){ c.setAttribute("cy", fy(parseFloat(orig(c, "cy"))).toFixed(2)); });
+      Array.prototype.forEach.call(svg.querySelectorAll("text.fig-anno"), function(t){ t.setAttribute("y", edge(parseFloat(orig(t, "y"))).toFixed(2)); });
+      Array.prototype.forEach.call(svg.querySelectorAll("text.fig-curve-label"), function(t){
+        var y = parseFloat(orig(t, "y"));
+        /* the pain label keeps its original distance above the bump's peak (y 226.67) */
+        var ny = t.getAttribute("fill") === "#E0562E" ? fy(226.67) - (226.67 - y) : fy(y);
+        t.setAttribute("y", ny.toFixed(2));
+      });
+      if (revealR) revealR.setAttribute("height", String(Ht));
+      mask.setAttribute("height", String(Ht)); mrect.setAttribute("height", String(Ht));
+      if (api.onLayout) api.onLayout();
+    }
+    api.x1y = function(){ return fy(117.33); };
+
+    function update(p){
+      mrect.setAttribute("x", (80 + p * 856 + 6 - 200).toFixed(1));
+    }
+    layout();
+    if (mq.addEventListener) mq.addEventListener("change", layout); else if (mq.addListener) mq.addListener(layout);
+    api.update = update;
+    return api;
   }
 
   /* ============================================================
      SCROLL CHOREOGRAPHY
   ============================================================ */
-  var heroST = null;
-  var scanTween = null; /* fig.02 scanline scrub — released to manual drag on first pointerdown */
-  var HOLD = 0.82; /* t hits 1.0 at 82% of the pin, then holds so the resolved state is readable */
+  var scanTween = null; /* fig.02 scanline scrub, released to manual drag on first pointerdown */
+  var HOLD = 0.82;      /* t hits 1.0 at 82% of the pin, then holds so the resolved state is readable */
 
-  /* ---- fig.02 unified scan control: one progress moves the scanline AND draws both curves ---- */
-  var scanEl = document.getElementById("scan");
-  var revealRect = document.getElementById("revealRect");
   function setScanProgress(p){
-    p = Math.max(0, Math.min(1, p));
+    p = clamp01(p);
     if (scanEl) scanEl.setAttribute("transform", "translate(" + (p * 856).toFixed(1) + ",0)");
     /* clip leads the scanline slightly so the x₁ halo reveals whole, never sliced */
     if (revealRect) revealRect.setAttribute("width", (84 + p * 906).toFixed(1));
+    if (fig2) fig2.update(p);
   }
 
   function applyT(t){
@@ -1259,38 +1888,39 @@ footer a:hover{ color:var(--bone); }
     applyT(1);
     setScanProgress(1);
   } else if (hasGSAP && typeof ScrollTrigger !== "undefined") {
-
-    // pin the hero and scrub the trajectory, with a hold plateau at the end
+    /* the hero is held by CSS position:sticky inside a track (see .hero-track), so the browser
+       keeps it in place on the compositor; this trigger only reads scroll progress through it */
+    var track = document.getElementById("heroTrack");
+    if (track) {
+      track.classList.add("is-scrubbed");
+      /* whole-pixel height, rounded exactly as the old pin-spacer was, so nothing below moves */
+      var sizeTrack = function(){ track.style.height = (hero.offsetHeight + Math.round(window.innerHeight * 2.8)) + "px"; };
+      sizeTrack();
+      ScrollTrigger.addEventListener("refreshInit", sizeTrack);
+    }
     var raw = { v: 0 };
-    var heroTween = gsap.to(raw, {
+    gsap.to(raw, {
       v: 1,
       ease: "none",
       onUpdate: function(){ applyT(Math.min(raw.v / HOLD, 1)); },
       scrollTrigger: {
-        trigger: "#top",
+        trigger: track || "#top",
         start: "top top",
-        end: "+=280%",
-        pin: true,
+        end: "bottom bottom",
         scrub: 0.6,
-        anticipatePin: 1,
         invalidateOnRefresh: true
       }
     });
-    heroST = heroTween.scrollTrigger;
-    // re-measure once everything (fonts, layout) has settled — prevents pin misregistration
     window.addEventListener("load", function(){ ScrollTrigger.refresh(); });
 
-    // everything else appears once the approach lands
     gsap.from(".hero-inner > *", { y: 30, opacity: 0, duration: 1.1, ease: "power3.out", stagger: 0.09, delay: 1.15 });
     gsap.from(".hero-hud, .scroll-cue", { opacity: 0, y: 14, duration: 0.9, ease: "power3.out", delay: 1.55 });
 
-    // scroll cue fades once the user commits
     gsap.to(".scroll-cue", {
       opacity: 0,
-      scrollTrigger: { trigger: "#top", start: "top top", end: "+=18%", scrub: true }
+      scrollTrigger: { trigger: track || "#top", start: "top top", end: "+=18%", scrub: true }
     });
 
-    // generic reveals
     gsap.utils.toArray(".rv").forEach(function(el){
       gsap.to(el, {
         y: 0, opacity: 1, duration: 0.9, ease: "power3.out",
@@ -1298,7 +1928,6 @@ footer a:hover{ color:var(--bone); }
       });
     });
 
-    // fig.02 — one scrubbed progress sweeps the scanline and draws both curves
     if (scanEl || revealRect) {
       setScanProgress(0);
       var scanObj = { p: 0 };
@@ -1310,12 +1939,19 @@ footer a:hover{ color:var(--bone); }
     }
     var pulse = document.getElementById("x1pulse");
     if (pulse) {
-      gsap.fromTo(pulse,
-        { scale: 1, opacity: 0.55, svgOrigin: "942 117.33" },
-        { scale: 2.1, opacity: 0, duration: 2.4, ease: "power1.out", repeat: -1, svgOrigin: "942 117.33" });
+      /* the x₁ point moves in the tall mobile layout, so the pulse is rebuilt around it */
+      var pulseTw = null;
+      var startPulse = function(){
+        if (pulseTw) pulseTw.kill();
+        var o = "942 " + (fig2 ? fig2.x1y() : 117.33).toFixed(2);
+        pulseTw = gsap.fromTo(pulse,
+          { scale: 1, opacity: 0.55, svgOrigin: o },
+          { scale: 2.1, opacity: 0, duration: 2.4, ease: "power1.out", repeat: -1, svgOrigin: o });
+      };
+      startPulse();
+      if (fig2) fig2.onLayout = startPulse;
     }
   } else {
-    // libraries failed to load — degrade gracefully
     applyT(1);
     setScanProgress(1);
     document.querySelectorAll(".rv").forEach(function(el){ el.style.opacity = 1; el.style.transform = "none"; });
@@ -1337,7 +1973,6 @@ footer a:hover{ color:var(--bone); }
         row.classList.add("open");
         head.setAttribute("aria-expanded", "true");
       }
-      // layout below shifts — let ScrollTrigger re-measure once the transition settles
       if (hasGSAP && typeof ScrollTrigger !== "undefined") {
         setTimeout(function(){ ScrollTrigger.refresh(); }, 550);
       }
@@ -1345,19 +1980,16 @@ footer a:hover{ color:var(--bone); }
   });
 
   /* ---- fig.02 as a slider: drag left/right to sweep the scanline and draw both curves ---- */
-  var fig = document.querySelector(".method-figure");
-  if (fig && (scanEl || revealRect)) {
-    var figSvg = fig.querySelector("svg");
+  if (figEl && figSvg && (scanEl || revealRect)) {
     var scanDrag = false;
     var scanFromX = function(clientX){
       var r = figSvg.getBoundingClientRect();
       var sx = (clientX - r.left) / r.width * 1000;
       setScanProgress((sx - 80) / 856);
     };
-    fig.addEventListener("pointerdown", function(e){
+    figEl.addEventListener("pointerdown", function(e){
       scanDrag = true;
-      if (fig.setPointerCapture) { try { fig.setPointerCapture(e.pointerId); } catch(err){} }
-      // the drag takes ownership: release the scanline from the scroll scrub
+      if (figEl.setPointerCapture) { try { figEl.setPointerCapture(e.pointerId); } catch (err) {} }
       if (scanTween) {
         if (scanTween.scrollTrigger) scanTween.scrollTrigger.kill();
         scanTween.kill();
@@ -1365,8 +1997,105 @@ footer a:hover{ color:var(--bone); }
       }
       scanFromX(e.clientX);
     });
-    fig.addEventListener("pointermove", function(e){ if (scanDrag) scanFromX(e.clientX); });
+    figEl.addEventListener("pointermove", function(e){ if (scanDrag) scanFromX(e.clientX); });
     window.addEventListener("pointerup", function(){ scanDrag = false; });
+  }
+
+  /* ============================================================
+     CONTACT: x₁ built from the same particles, with the same probe
+  ============================================================ */
+  if (hasThree && !reduced) {
+    try { initMark(); } catch (err) { if (window.console) console.warn("x1 mark fallback:", err); }
+  }
+
+  function initMark(){
+    var mark = document.querySelector(".contact .x1-mark");
+    var svg = mark ? mark.querySelector("svg") : null;
+    var section = document.getElementById("contact");
+    if (!svg || !section) return;
+    var cv = document.createElement("canvas");
+    cv.className = "x1-canvas";
+    cv.setAttribute("aria-hidden", "true");
+    var renderer = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: false, premultipliedAlpha: true });
+    mark.insertBefore(cv, svg.nextSibling);  /* only once a context exists */
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    renderer.setPixelRatio(dpr);
+    renderer.setClearColor(0x000000, 0);
+    var scene = new THREE.Scene();
+    var cam = new THREE.OrthographicCamera(0, 260, 0, 260, -10, 10);
+
+    var small = window.matchMedia("(max-width: 1000px)").matches;
+    var sc = small ? 0.6 : 1;
+    var counts = [520, 460, 300, 150, 640, 70].map(function(n){ return Math.round(n * sc); });
+    var total = counts.reduce(function(a, b){ return a + b; }, 0);
+    var data = new Float32Array(total * 4), sd = new Float32Array(total * 3);
+    var idx = 0;
+    counts.forEach(function(n, kind){
+      for (var q = 0; q < n; q++, idx++) {
+        var prm = kind === 3 ? Math.pow(q / n, 1.6) : (kind === 4 ? q / n : Math.random() * Math.PI * 2);
+        data[idx*4] = kind; data[idx*4+1] = prm;
+        data[idx*4+2] = kind === 4 ? ((Math.random() + Math.random() + Math.random() - 1.5) * 2.4) : 0;
+        sd[idx*3] = Math.random(); sd[idx*3+1] = Math.random(); sd[idx*3+2] = Math.random();
+      }
+    });
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(total * 3), 3));
+    geo.setAttribute("aData", new THREE.BufferAttribute(data, 4));
+    geo.setAttribute("aSeed", new THREE.BufferAttribute(sd, 3));
+    var mu = {
+      uTime: { value: 0 }, uMouse: { value: new THREE.Vector2(-999, -999) }, uStrength: { value: 0 },
+      uLoupeR: { value: 34 }, uUnitPx: { value: 1 }, uMinPx: { value: 1.2 * dpr }
+    };
+    var pts = new THREE.Points(geo, new THREE.ShaderMaterial({
+      uniforms: mu, vertexShader: src("vsMark"), fragmentShader: src("fsMark"),
+      transparent: true, depthWrite: false, depthTest: false,
+      blending: THREE.CustomBlending, blendEquation: THREE.AddEquation,
+      blendSrc: THREE.OneFactor, blendDst: THREE.OneFactor,
+      blendSrcAlpha: THREE.OneFactor, blendDstAlpha: THREE.OneFactor
+    }));
+    pts.frustumCulled = false;
+    scene.add(pts);
+
+    function place(){
+      var mr = mark.getBoundingClientRect(), sr = svg.getBoundingClientRect();
+      cv.style.left = (sr.left - mr.left).toFixed(2) + "px";
+      cv.style.top = (sr.top - mr.top).toFixed(2) + "px";
+      cv.style.width = sr.width.toFixed(2) + "px";
+      cv.style.height = sr.height.toFixed(2) + "px";
+      renderer.setSize(sr.width, sr.height, false);
+      mu.uUnitPx.value = (sr.width / 260) * dpr;
+    }
+    place();
+    window.addEventListener("resize", place);
+    window.addEventListener("load", place);
+    mark.classList.add("x1-gl");
+
+    var visible = false, last = null, time = 0, mStr = 0;
+    var mouse = mu.uMouse.value;
+    function tick(now){
+      requestAnimationFrame(tick);
+      if (!visible || pageHidden) { last = null; return; }
+      var dt = last === null ? 1 / 60 : Math.min((now - last) / 1000, 0.1);
+      last = now; time += dt;
+      mu.uTime.value = time;
+      var sr = svg.getBoundingClientRect();
+      var mx = (ptr.x - sr.left) / sr.width * 260, my = (ptr.y - sr.top) / sr.height * 260;
+      var near = ptr.active && mx > -40 && mx < 300 && my > -40 && my < 300;
+      if (near && mStr < 0.05) { mouse.x = mx; mouse.y = my; }
+      if (near) { mouse.x += (mx - mouse.x) * 0.2; mouse.y += (my - mouse.y) * 0.2; }
+      mStr += ((near ? 1 : 0) - mStr) * 0.08;
+      mu.uStrength.value = mStr;
+      renderer.render(scene, cam);
+    }
+    requestAnimationFrame(tick);
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function(entries){
+        visible = entries[0].isIntersecting;
+        if (visible) place();
+      }, { rootMargin: "120px 0px" }).observe(section);
+    } else {
+      visible = true;
+    }
   }
 })();
 </script>
